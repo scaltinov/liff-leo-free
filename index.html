@@ -22,30 +22,20 @@
           </div>
 
           <div class="mb-3">
-            <label for="time" class="form-label">入店予約時刻 <span class="text-danger">*</span></label>
+            <label for="time" class="form-label">ご入店予約時刻 <span class="text-danger">*</span></label>
             <select id="time" name="time" class="form-select" required>
               <option value="">選択してください</option>
             </select>
           </div>
 
           <div class="mb-3">
-            <label for="name" class="form-label">予約名 <span class="text-danger">*</span></label>
-            <input id="name" name="name" class="form-control" placeholder="山田太郎" required maxlength="50" />
+            <label for="name" class="form-label">ご予約名 <span class="text-danger">*</span></label>
+            <input id="name" name="name" class="form-control" placeholder="山田花子" required maxlength="50" />
           </div>
 
           <div class="mb-3">
-            <label for="party_size" class="form-label">人数 <span class="text-danger">*</span></label>
-            <select id="party_size" name="party_size" class="form-select" required>
-              <option value="1" selected>1名</option>
-              <option value="2">2名</option>
-              <option value="3">3名</option>
-              <option value="4">4名</option>
-              <option value="5">5名</option>
-              <option value="6">6名</option>
-              <option value="7">7名</option>
-              <option value="8">8名</option>
-              <option value="9">9名</option>
-            </select>
+            <label for="party_size" class="form-label">ご人数 <span class="text-danger">*</span></label>
+            <input id="party_size" name="party_size" type="number" class="form-control" value="1" required min="1" max="9" />
           </div>
 
           <div id="error" class="alert alert-danger d-none">送信に失敗しました。</div>
