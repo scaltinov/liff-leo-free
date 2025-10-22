@@ -96,15 +96,47 @@ function fillDemoData() {
   console.log("✅ デモデータの自動入力が完了しました");
 }
 
+// 予約受付期限をチェック
+function checkReservationDeadline() {
+  // 2025年11月8日 20:00を基準とする
+  const deadlineDate = new Date(2025, 10, 8, 20, 0, 0); // 注：月は0ベースなので10 = 11月
+  const currentDate = new Date();
+
+  console.log("Deadline:", deadlineDate.toLocaleString('ja-JP'));
+  console.log("Current:", currentDate.toLocaleString('ja-JP'));
+  console.log("Is expired:", currentDate > deadlineDate);
+
+  return currentDate > deadlineDate;
+}
+
 (async () => {
   try {
-    // 時刻オプションを生成
-    generateTimeOptions();
-
     // URL パラメータをチェック
     const urlParams = new URLSearchParams(window.location.search);
     const isDebugMode = urlParams.has('debug');
     const isDemoMode = urlParams.has('demo');
+    const showClosedMode = urlParams.has('closed'); // テスト用: クローズメッセージ強制表示
+
+    // 予約受付期限チェック
+    const isExpired = checkReservationDeadline();
+
+    // デバッグモード以外で期限切れ、または showClosedMode が有効な場合
+    if ((isExpired && !isDebugMode) || showClosedMode) {
+      // フォームを非表示、クローズメッセージを表示
+      form.classList.add('d-none');
+      btn.closest('.fixed-bottom-button').classList.add('d-none');
+      $("#closed-message").classList.remove('d-none');
+
+      if (showClosedMode) {
+        console.log("🧪 テストモード - クローズメッセージを強制表示");
+      } else {
+        console.log("⏰ 予約受付期限切れ - クローズメッセージを表示");
+      }
+      return;
+    }
+
+    // 時刻オプションを生成
+    generateTimeOptions();
 
     // デバッグモード時はLIFF初期化を無効化
     if (!isDebugMode) {

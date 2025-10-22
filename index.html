@@ -15,6 +15,15 @@
         <h1 class="text-center mb-4">PLATINUM初回DAY 予約フォーム</h1>
         <div id="diag" class="alert alert-info d-none" style="font-family: monospace; white-space: pre-wrap;"></div>
 
+        <!-- 予約受付終了メッセージ -->
+        <div id="closed-message" class="alert alert-warning d-none text-center">
+          <p class="mb-3">予約受付は終了いたしました。</p>
+          <p class="mb-3">お手数ですがお店に直接お電話ください。</p>
+          <a href="tel:03-5155-0799" class="btn btn-primary btn-lg">
+            <i class="bi bi-telephone"></i> お店に電話する
+          </a>
+        </div>
+
         <form id="form" class="card p-4" novalidate>
           <div class="mb-3">
             <label for="date" class="form-label">日付</label>
