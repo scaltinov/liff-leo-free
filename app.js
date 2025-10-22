@@ -62,11 +62,17 @@ function generateTimeOptions() {
 }
 
 function buildMsg(){
-  const v = Object.fromEntries(new FormData(form).entries());
+  const formData = new FormData(form);
+  const v = Object.fromEntries(formData.entries());
+
+  // チェックボックスの複数値を取得
+  const idTypes = formData.getAll('id_type');
+  const idTypeText = idTypes.length > 0 ? idTypes.join('、') : '';
 
   return `予約日時：${v.date} ${v.time}
 予約名：${v.name}
-人数：${v.party_size}名`;
+人数：${v.party_size}名
+顔つき身分証：${idTypeText}`;
 }
 
 // デモ用：サンプルデータを自動入力
@@ -147,6 +153,37 @@ function fillDemoData() {
           hasError = true;
           if (!firstErrorField) firstErrorField = element;
         }
+      }
+
+      // 身分証チェック（複数選択必須）
+      const idCheckboxes = document.querySelectorAll('[name="id_type"]');
+      const isIdChecked = Array.from(idCheckboxes).some(cb => cb.checked);
+      if (!isIdChecked) {
+        // 最初のチェックボックスの親要素にエラーを表示
+        const firstIdCheckbox = idCheckboxes[0];
+        if (firstIdCheckbox) {
+          const parent = firstIdCheckbox.closest('.mb-3');
+          if (parent) {
+            parent.classList.add('has-error');
+            if (!firstErrorField) {
+              firstErrorField = parent;
+            }
+          }
+        }
+        hasError = true;
+      }
+
+      // 年齢確認チェック
+      const ageConfirmCheckbox = $('[name="age_confirm"]');
+      if (!ageConfirmCheckbox || !ageConfirmCheckbox.checked) {
+        const parent = ageConfirmCheckbox ? ageConfirmCheckbox.closest('.mb-3') : null;
+        if (parent) {
+          parent.classList.add('has-error');
+          if (!firstErrorField) {
+            firstErrorField = parent;
+          }
+        }
+        hasError = true;
       }
 
       if (hasError) {
