@@ -4,20 +4,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a LINE LIFF (LINE Front-end Framework) HTML file for a Japanese contact form. The file is designed to be referenced/loaded by LIFF applications within the LINE messaging platform.
+This is a LINE LIFF (LINE Front-end Framework) HTML file for a Japanese reservation form. The file is designed to be referenced/loaded by LIFF applications within the LINE messaging platform.
 
 ## Architecture
 
 - **Single HTML file**: Complete LIFF application in `index.html`
 - **LIFF SDK integration**: Uses LINE LIFF SDK v2 for messaging functionality
 - **Static hosting**: Designed to be served directly to LIFF without build process
-- **Japanese UI**: Contact form with Japanese labels and messaging
+- **Japanese UI**: Reservation form with Japanese labels and messaging
 
 ## Key Components
 
-- **LIFF ID**: `2008169967-p3vmNKQg` - configured for this specific LINE application
-- **Contact form**: Name (required) and message (required, max 1200 chars) fields
-- **Message sending**: Sends formatted message to LINE chat via LIFF SDK
+- **LIFF ID**: `2008341587-r6XPlxxZ` - configured for Leo Platinum LINE application
+- **Reservation form**:
+  - Date: 11/8 (fixed, read-only)
+  - Time: 20:00〜23:30 in 15-minute intervals (dropdown, required)
+  - Name: Text input (required)
+  - Party size: 1-9 people (dropdown, required)
+- **Message sending**: Sends formatted reservation message to LINE chat via LIFF SDK
 - **Auto-close**: Closes LIFF window after successful message send
 
 ## Development
