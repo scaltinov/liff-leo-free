@@ -98,8 +98,8 @@ function fillDemoData() {
 
 // 予約受付期限をチェック
 function checkReservationDeadline() {
-  // 2025年11月8日 20:00を基準とする
-  const deadlineDate = new Date(2025, 10, 8, 20, 0, 0); // 注：月は0ベースなので10 = 11月
+  // テスト用：2025年10月23日 5:26を基準とする（JST固定）
+  const deadlineDate = new Date('2025-10-23T05:26:00+09:00');
   const currentDate = new Date();
 
   console.log("Deadline:", deadlineDate.toLocaleString('ja-JP'));
