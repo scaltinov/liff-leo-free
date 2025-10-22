@@ -1,0 +1,123 @@
+/* 必要最小限のカスタムスタイル（Bootstrapで対応できない部分のみ） */
+
+/* プレースホルダーの文字色を薄く */
+.form-control::placeholder,
+.form-select::placeholder {
+  color: #d1d5db;
+  opacity: 1;
+}
+
+#diag {
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.fixed-bottom-button {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  background: linear-gradient(180deg, rgba(248,249,250,0) 0%, rgba(248,249,250,1) 40%, rgba(248,249,250,1) 100%);
+  z-index: 1000;
+}
+
+/* 条件分岐で表示される領域のスタイル */
+#experience_fields,
+#media_referral_field,
+#media_other_field,
+#job_other_field {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 8px;
+}
+
+/* 経験詳細フィールド専用の追加スタイル */
+#experience_fields {
+  margin-bottom: 16px;
+}
+
+/* 経験詳細フィールド内のエラー表示を強化 */
+#experience_fields .mb-3.has-error {
+  background-color: #f8d7da !important;
+  border: 2px solid #dc3545 !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  margin-bottom: 16px !important;
+}
+
+/* 経験詳細フィールド内のさらに強いエラー表示 */
+#experience_fields .mb-3.experience-field-error {
+  background-color: #fecaca !important;
+  border: 2px solid #dc2626 !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  margin-bottom: 16px !important;
+}
+
+#experience_fields .form-control.is-invalid,
+#experience_fields input.form-control.is-invalid {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+  background-color: #fff !important;
+}
+
+#experience_fields .mb-3.has-error .form-label,
+#experience_fields .mb-3.experience-field-error .form-label {
+  color: #842029 !important;
+  font-weight: 700 !important;
+}
+
+/* 経験詳細コンテナ全体にエラーがある場合の追加スタイル */
+#experience_fields.has-errors {
+  border: 2px solid #dc3545 !important;
+  background-color: #fef2f2 !important;
+  border-radius: 12px !important;
+}
+
+/* デバッグ用：エラー状態の要素を強制表示 */
+.form-control.is-invalid {
+  border: 2px solid #dc3545 !important;
+  background-color: #fff5f5 !important;
+}
+
+.mb-3.has-error {
+  background-color: #fed7d7 !important;
+  border: 1px solid #fc8181 !important;
+  padding: 8px !important;
+  border-radius: 6px !important;
+}
+
+/* 必須項目バリデーションエラー時のスタイル */
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+.form-check.is-invalid .form-check-input {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+.form-check.is-invalid .form-check-label {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* エラー状態の親要素 */
+.mb-3.has-error {
+  padding: 8px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c2c7;
+  border-radius: 6px;
+}
+
+.mb-3.has-error .form-label {
+  color: #842029;
+  font-weight: 600;
+}

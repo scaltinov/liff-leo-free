@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>お問い合わせ</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-light">
+  <div class="container-fluid py-3">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-6">
+        <h1 class="text-center mb-4">Leo 求人応募フォーム</h1>
+        <div id="diag" class="alert alert-info d-none" style="font-family: monospace; white-space: pre-wrap;"></div>
+
+        <form id="form" class="card p-4" novalidate>
+          <div class="mb-3">
+            <label for="stage_name" class="form-label">希望源氏名</label>
+            <input id="stage_name" name="stage_name" class="form-control" placeholder="太郎" maxlength="30" />
+          </div>
+
+          <div class="mb-3">
+            <label for="real_name" class="form-label">本名 <span class="text-danger">*</span></label>
+            <input id="real_name" name="real_name" class="form-control" placeholder="山田太郎" required maxlength="30" />
+          </div>
+
+          <div class="mb-3">
+            <label for="kana" class="form-label">よみがな <span class="text-danger">*</span></label>
+            <input id="kana" name="kana" class="form-control" placeholder="やまだたろう" required maxlength="30" />
+          </div>
+
+          <div class="mb-3">
+            <label for="phone" class="form-label">携帯電話番号 <span class="text-danger">*</span></label>
+            <input id="phone" name="phone" type="tel" class="form-control" placeholder="090-1234-5678" required maxlength="15" />
+          </div>
+
+          <div class="mb-3">
+            <label for="age" class="form-label">年齢 <span class="text-danger">*</span></label>
+            <input id="age" name="age" type="number" class="form-control" placeholder="25" required min="18" max="99" />
+          </div>
+
+          <div class="mb-3">
+            <label for="location" class="form-label">現在の所在地 <span class="text-danger">*</span></label>
+            <input id="location" name="location" class="form-control" placeholder="東京都渋谷区" required maxlength="50" />
+          </div>
+
+          <div class="mb-3">
+            <label for="current_job" class="form-label">現職 <span class="text-danger">*</span></label>
+            <input id="current_job" name="current_job" class="form-control" placeholder="会社員、学生、フリーター等" required maxlength="50" />
+          </div>
+
+          <div class="mb-3">
+            <label for="experience" class="form-label">経験の有無 <span class="text-danger">*</span></label>
+            <select id="experience" name="experience" class="form-select" required>
+              <option value="">選択してください</option>
+              <option value="有り">有り</option>
+              <option value="無し">無し</option>
+            </select>
+          </div>
+
+          <div id="experience_fields" class="d-none">
+            <div class="mb-3">
+              <label for="store_name" class="form-label">店舗名 <span class="text-danger">*</span></label>
+              <input id="store_name" name="store_name" class="form-control" placeholder="○○○" maxlength="50" />
+            </div>
+            <div class="mb-3">
+              <label for="experience_years" class="form-label">経験年数 <span class="text-danger">*</span></label>
+              <input id="experience_years" name="experience_years" class="form-control" placeholder="2年" maxlength="20" />
+            </div>
+            <div class="mb-3">
+              <label for="employment_status" class="form-label">在籍状況 <span class="text-danger">*</span></label>
+              <input id="employment_status" name="employment_status" class="form-control" placeholder="在籍中、退職済み" maxlength="30" />
+            </div>
+            <div class="mb-3">
+              <label for="avg_sales" class="form-label">現在のAVG月間総売</label>
+              <input id="avg_sales" name="avg_sales" class="form-control" placeholder="100万円" maxlength="30" />
+            </div>
+            <div class="mb-3">
+              <label for="max_sales" class="form-label">MAX月間総売</label>
+              <input id="max_sales" name="max_sales" class="form-control" placeholder="200万円" maxlength="30" />
+            </div>
+          </div>
+
+          <!-- 一時的に単一選択に変更（将来的に複数選択に戻す可能性あり） -->
+          <div class="mb-3">
+            <label class="form-label">Leoを知った媒体</label>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="media_source" id="media1" value="ホスホス" />
+                  <label class="form-check-label" for="media1">ホスホス</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="media_source" id="media2" value="ホストワーク" />
+                  <label class="form-check-label" for="media2">ホストワーク</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="media_source" id="media3" value="ホスパラ" />
+                  <label class="form-check-label" for="media3">ホスパラ</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="media_source" id="media4" value="ホスリク" />
+                  <label class="form-check-label" for="media4">ホスリク</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="media_source" id="media5" value="Youtube" />
+                  <label class="form-check-label" for="media5">YouTube</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="media_source" id="media6" value="X(Twitter)" />
+                  <label class="form-check-label" for="media6">X (Twitter)</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="media_source" id="media7" value="Instagram" />
+                  <label class="form-check-label" for="media7">Instagram</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="media_source" id="media8" value="TikTok" />
+                  <label class="form-check-label" for="media8">TikTok</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="media_source" id="media9" value="トラック" />
+                  <label class="form-check-label" for="media9">トラック</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="media_source" id="media10" value="紹介" />
+                  <label class="form-check-label" for="media10">紹介</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="media_source" id="media11" value="その他" />
+                  <label class="form-check-label" for="media11">その他</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3 d-none" id="media_referral_field">
+              <label for="media_referral" class="form-label">紹介者について</label>
+              <input id="media_referral" name="media_referral" class="form-control" placeholder="紹介してくれた方の名前や関係性など" maxlength="100" />
+          </div>
+
+          <div class="mb-3 d-none" id="media_other_field">
+            <label for="media_other" class="form-label">その他の媒体</label>
+            <input id="media_other" name="media_other" class="form-control" placeholder="詳細をご記入ください" maxlength="50" />
+          </div>
+
+          <div class="mb-3">
+            <label for="job_type" class="form-label">希望職種 <span class="text-danger">*</span></label>
+            <select id="job_type" name="job_type" class="form-select" required>
+              <option value="">選択してください</option>
+              <option value="レギュラー">レギュラー</option>
+              <option value="バイト（週4〜）">バイト（週4〜）</option>
+              <option value="店舗運営スタッフ">店舗運営スタッフ</option>
+              <option value="その他">その他</option>
+            </select>
+          </div>
+
+          <div class="mb-3 d-none" id="job_other_field">
+            <label for="job_other" class="form-label">その他の職種</label>
+            <input id="job_other" name="job_other" class="form-control" placeholder="詳細をご記入ください" maxlength="50" />
+          </div>
+
+          <div class="mb-3 d-none" id="dormitory_field">
+            <label class="form-label">寮希望（レギュラーのみ） <span class="text-danger">*</span></label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="dormitory" id="dormitory1" value="希望する" />
+                <label class="form-check-label" for="dormitory1">希望する</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="dormitory" id="dormitory2" value="希望しない" />
+                <label class="form-check-label" for="dormitory2">希望しない</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="start_date" class="form-label">勤務開始希望日</label>
+            <input id="start_date" name="start_date" class="form-control" placeholder="即日、○月○日頃、要相談" maxlength="50" />
+          </div>
+
+          <div class="mb-3">
+            <label for="motivation" class="form-label">志望動機</label>
+            <textarea id="motivation" name="motivation" class="form-control" placeholder="志望動機をご記入ください" maxlength="500" rows="4"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">親の承諾の有無（ホストクラブで働くことについて） <span class="text-danger">*</span></label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="parent_consent" id="parent1" value="有り" required />
+                <label class="form-check-label" for="parent1">有り</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="parent_consent" id="parent2" value="無し" required />
+                <label class="form-check-label" for="parent2">無し</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">身分証（マイナンバー、免許証、住基カード、パスポートのいずれか持参） <span class="text-danger">*</span></label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="id_document" id="id1" value="可" required />
+                <label class="form-check-label" for="id1">可</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="id_document" id="id2" value="不可" required />
+                <label class="form-check-label" for="id2">不可</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">本入店時本籍地記載の住民票準備の可否 <span class="text-danger">*</span></label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="resident_card" id="resident1" value="可" required />
+                <label class="form-check-label" for="resident1">可</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="resident_card" id="resident2" value="不可" required />
+                <label class="form-check-label" for="resident2">不可</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="interview_date" class="form-label">面接希望日時</label>
+            <textarea id="interview_date" name="interview_date" class="form-control" placeholder="基本20時前後〜体入含めて長くて3時間程度。複数候補日あるとスムーズです。&#10;○月○日 20:00〜、○月○日 19:00〜" maxlength="300" rows="3"></textarea>
+            <div class="form-text">複数の候補日をご記入いただくとスムーズです</div>
+          </div>
+
+          <div id="error" class="alert alert-danger d-none">送信に失敗しました。</div>
+          <div id="ok" class="alert alert-success d-none">送信しました。LINEトークをご確認ください。</div>
+        </form>
+      </div>
+    </div>
+    <!-- フッターボタンのためのスペース -->
+    <div style="height: 100px;"></div>
+  </div>
+
+  <div class="fixed-bottom-button">
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+          <button id="submit" class="btn btn-success btn-lg w-100" type="button">応募内容を送信</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SDKを先に読み込む -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
