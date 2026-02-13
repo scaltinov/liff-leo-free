@@ -25,6 +25,14 @@ function initUI() {
   const partySizeInput = $("#party_size");
   if (partySizeInput) {
     partySizeInput.max = CONFIG.EVENT.MAX_PARTY_SIZE;
+    
+    // 値が変更された際の制約追加
+    partySizeInput.addEventListener('input', function() {
+      if (this.value > CONFIG.EVENT.MAX_PARTY_SIZE) {
+        this.value = CONFIG.EVENT.MAX_PARTY_SIZE;
+      }
+    });
+
     if (parseInt(partySizeInput.value) > CONFIG.EVENT.MAX_PARTY_SIZE) {
       partySizeInput.value = CONFIG.EVENT.MAX_PARTY_SIZE;
     }
@@ -143,7 +151,7 @@ function fillDemoData() {
   const demoData = {
     time: `${CONFIG.TIME_SETTINGS.START_HOUR}:${CONFIG.TIME_SETTINGS.START_MINUTE.toString().padStart(2, '0')}`,
     name: '山田太郎',
-    party_size: '2',
+    party_size: CONFIG.EVENT.MAX_PARTY_SIZE.toString(),
     age_confirm: true,
     photo_consent: true
   };
@@ -251,10 +259,19 @@ function checkReservationDeadline() {
       const requiredFields = ['time', 'name', 'party_size'];
       for(let field of requiredFields) {
         const element = $(`[name="${field}"]`);
-        if(element && !element.value.trim()) {
-          showFieldError(field);
-          hasError = true;
-          if (!firstErrorField) firstErrorField = element;
+        if(element) {
+          if (!element.value.trim()) {
+            showFieldError(field);
+            hasError = true;
+            if (!firstErrorField) firstErrorField = element;
+          } else if (field === 'party_size') {
+            const size = parseInt(element.value);
+            if (isNaN(size) || size < 1 || size > CONFIG.EVENT.MAX_PARTY_SIZE) {
+              showFieldError(field);
+              hasError = true;
+              if (!firstErrorField) firstErrorField = element;
+            }
+          }
         }
       }
 
