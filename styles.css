@@ -36,6 +36,10 @@
   margin-top: 8px;
 }
 
+#event-note {
+  white-space: pre-wrap;
+}
+
 /* 経験詳細フィールド専用の追加スタイル */
 #experience_fields {
   margin-bottom: 16px;

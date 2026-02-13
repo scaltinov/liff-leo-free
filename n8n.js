@@ -56,8 +56,17 @@ const parseReservation = (text) => {
 
         // 値がある場合のみ設定
         if (trimmedValue.length > 0) {
-          data.parsed[key] = trimmedValue;
-          console.log("    → Updated with value");
+          // 人数の場合は数字に変換
+          if (key === '人数') {
+            const numberValue = parseInt(trimmedValue, 10);
+            if (!isNaN(numberValue)) {
+              data.parsed[key] = numberValue;
+              console.log("    → Updated with numeric value:", numberValue);
+            }
+          } else {
+            data.parsed[key] = trimmedValue;
+            console.log("    → Updated with value");
+          }
         }
         break; // マッチしたら次の行へ
       }
@@ -78,8 +87,13 @@ const parseReservation = (text) => {
       const hour = dateTimeMatch[3];
       const minute = dateTimeMatch[4];
 
-      // 2025年を想定（イベント日付から）、ISO 8601形式の日時で統合
-      const isoDateTime = `2025-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour}:${minute}:00`;
+      // 年を抽出（メッセージにあればそれを使用、なければ現在の年）
+      const yearMatch = text.match(/(\d{4})年/);
+      const currentYear = new Date().getFullYear();
+      const eventYear = yearMatch ? yearMatch[1] : currentYear;
+
+      // ISO 8601形式の日時で統合
+      const isoDateTime = `${eventYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour}:${minute}:00`;
 
       data.notionDateTime = isoDateTime;
 

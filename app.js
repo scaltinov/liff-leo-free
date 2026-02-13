@@ -1,4 +1,4 @@
-const LIFF_ID = "2008341587-r6XPlxxZ";
+const LIFF_ID = CONFIG.LIFF_ID;
 const $ = (s)=>document.querySelector(s);
 const form = $("#form"), btn=$("#submit"), ok=$("#ok"), err=$("#error"), diag=$("#diag");
 
@@ -10,6 +10,69 @@ function logd(obj){
   if (isDebugMode) {
     diag.classList.remove('d-none');
     diag.textContent = typeof obj==='string'?obj:JSON.stringify(obj,null,2);
+  }
+}
+
+// UIの初期化
+function initUI() {
+  document.title = CONFIG.EVENT.TITLE;
+  const h1 = $("h1");
+  if (h1) h1.textContent = CONFIG.EVENT.TITLE;
+
+  const dateInput = $("#date");
+  if (dateInput) dateInput.value = CONFIG.EVENT.DATE_DISPLAY;
+
+  const partySizeInput = $("#party_size");
+  if (partySizeInput) {
+    partySizeInput.max = CONFIG.EVENT.MAX_PARTY_SIZE;
+    if (parseInt(partySizeInput.value) > CONFIG.EVENT.MAX_PARTY_SIZE) {
+      partySizeInput.value = CONFIG.EVENT.MAX_PARTY_SIZE;
+    }
+  }
+
+  const ageLabel = $('label[for="age_confirm"]');
+  if (ageLabel) {
+    ageLabel.textContent = `${CONFIG.EVENT.YEAR}年${CONFIG.EVENT.DATE_DISPLAY}日時点で満20歳以上であることに同意`;
+  }
+
+  // 身分証の選択肢を生成
+  const idContainer = $("#id-types-container");
+  if (idContainer) {
+    idContainer.innerHTML = '';
+    CONFIG.EVENT.ID_TYPES.forEach((type, index) => {
+      const div = document.createElement('div');
+      div.className = 'form-check';
+      const id = `id_type_${index}`;
+      div.innerHTML = `
+        <input class="form-check-input" type="checkbox" name="id_type" id="${id}" value="${type}" />
+        <label class="form-check-label" for="${id}">${type}</label>
+      `;
+      idContainer.appendChild(div);
+    });
+  }
+
+  // 注意書きの表示
+  const noteArea = $("#event-note");
+  if (noteArea && CONFIG.EVENT.NOTE) {
+    noteArea.textContent = CONFIG.EVENT.NOTE;
+    noteArea.classList.remove('d-none');
+  }
+
+  const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
+  phoneLinks.forEach(link => {
+    link.href = `tel:${CONFIG.EVENT.PHONE.replace(/-/g, '')}`;
+    if (link.textContent.includes('03-')) {
+      link.textContent = CONFIG.EVENT.PHONE;
+    }
+  });
+  
+  const phoneText = $("#closed-message p:nth-child(3)");
+  if (phoneText && phoneText.textContent.includes('03-')) {
+     const phoneLink = phoneText.querySelector('a');
+     if (phoneLink) {
+       phoneLink.href = `tel:${CONFIG.EVENT.PHONE.replace(/-/g, '')}`;
+       phoneLink.textContent = CONFIG.EVENT.PHONE;
+     }
   }
 }
 
@@ -41,17 +104,14 @@ function clearAllErrors() {
   document.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
 }
 
-// 20:00〜23:30の時刻オプションを生成（15分単位）
+// 時刻オプションを生成
 function generateTimeOptions() {
   const timeSelect = $("#time");
-  const startHour = 20;
-  const startMinute = 0;
-  const endHour = 23;
-  const endMinute = 30;
+  const { START_HOUR, START_MINUTE, END_HOUR, END_MINUTE, INTERVAL } = CONFIG.TIME_SETTINGS;
 
-  for (let hour = startHour; hour <= endHour; hour++) {
-    const maxMinute = (hour === endHour) ? endMinute : 45;
-    for (let minute = (hour === startHour ? startMinute : 0); minute <= maxMinute; minute += 15) {
+  for (let hour = START_HOUR; hour <= END_HOUR; hour++) {
+    const maxMinute = (hour === END_HOUR) ? END_MINUTE : 59;
+    for (let minute = (hour === START_HOUR ? START_MINUTE : 0); minute <= maxMinute; minute += INTERVAL) {
       const timeValue = `${hour}:${minute.toString().padStart(2, '0')}`;
       const option = document.createElement('option');
       option.value = timeValue;
@@ -80,9 +140,9 @@ function fillDemoData() {
   console.log("🎬 デモモード: サンプルデータを自動入力中...");
 
   const demoData = {
-    time: '20:00',
+    time: `${CONFIG.TIME_SETTINGS.START_HOUR}:${CONFIG.TIME_SETTINGS.START_MINUTE.toString().padStart(2, '0')}`,
     name: '山田太郎',
-    party_size: '4'
+    party_size: '2'
   };
 
   Object.entries(demoData).forEach(([name, value]) => {
@@ -98,8 +158,7 @@ function fillDemoData() {
 
 // 予約受付期限をチェック
 function checkReservationDeadline() {
-  // 2025年11月8日 20:00を基準とする（JST固定）
-  const deadlineDate = new Date('2025-11-08T20:00:00+09:00');
+  const deadlineDate = new Date(CONFIG.EVENT.DEADLINE);
   const currentDate = new Date();
 
   console.log("Deadline:", deadlineDate.toLocaleString('ja-JP'));
@@ -111,6 +170,9 @@ function checkReservationDeadline() {
 
 (async () => {
   try {
+    // UIの初期化
+    initUI();
+
     // URL パラメータをチェック
     const urlParams = new URLSearchParams(window.location.search);
     const isDebugMode = urlParams.has('debug');
@@ -124,7 +186,9 @@ function checkReservationDeadline() {
     if ((isExpired && !isDebugMode) || showClosedMode) {
       // フォームを非表示、クローズメッセージを表示
       form.classList.add('d-none');
-      btn.closest('.fixed-bottom-button').classList.add('d-none');
+      if (btn.closest('.fixed-bottom-button')) {
+        btn.closest('.fixed-bottom-button').classList.add('d-none');
+      }
       $("#closed-message").classList.remove('d-none');
 
       if (showClosedMode) {
@@ -223,7 +287,7 @@ function checkReservationDeadline() {
         err.classList.remove('d-none');
         if (firstErrorField) {
           firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          firstErrorField.focus();
+          if (typeof firstErrorField.focus === 'function') firstErrorField.focus();
         }
         return;
       }
