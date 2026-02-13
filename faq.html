@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>FAQ - 予約システム</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .faq-item {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 1.5rem;
+    }
+    .faq-question {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: flex-start;
+    }
+    .faq-question::before {
+      content: "Q.";
+      color: #0d6efd;
+      margin-right: 0.5rem;
+      font-size: 1.2rem;
+    }
+    .faq-answer {
+      color: #555;
+      padding-left: 1.8rem;
+    }
+    .faq-answer::before {
+      content: "A.";
+      color: #198754;
+      margin-left: -1.8rem;
+      margin-right: 0.5rem;
+      font-weight: bold;
+    }
+    .back-button {
+      position: sticky;
+      bottom: 20px;
+      margin-top: 2rem;
+    }
+    body {
+      background-color: #f8f9fa;
+    }
+    .card {
+      border: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container-fluid py-4">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-6">
+        <h1 class="text-center mb-4">よくあるご質問 (FAQ)</h1>
+        
+        <div class="card p-4 mb-4">
+          <div class="faq-item">
+            <div class="faq-question">誰でも参加できますか？</div>
+            <div class="faq-answer">はい。初めてLeoにご来店されるお客様であればどなたでもご参加いただけます。</div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">総勢で何組まで入店可能ですか？</div>
+            <div class="faq-answer">事前予約と当日入店を合わせて、当日は40組様限定となっております。限定数を超過した場合は、ご予約のお客様でもご案内が難しくなる可能性があるため、弊店より改めてご連絡させていただきます。</div>
+          </div>
+
+          <div class="faq-item border-0">
+            <div class="faq-question">キャストのリクエスト（指名）は可能ですか？</div>
+            <div class="faq-answer">当日は混雑が予想されるため、キャストのリクエストはお受けできかねます。あらかじめご了承ください。</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">送り指名はどのように決まりますか？</div>
+            <div class="faq-answer">接客させていただいたキャストの中からお選び頂く形となります。</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">飲み直しは可能ですか？</div>
+            <div class="faq-answer">もちろん可能です。当日専用プランにて飲み直しが可能になります。</div>
+          </div>
+        </div>
+
+        <div class="text-center mb-5">
+          <a href="index.html" class="btn btn-secondary btn-lg w-100">予約フォームに戻る</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    // タイトルの設定
+    if (typeof CONFIG !== 'undefined' && CONFIG.EVENT && CONFIG.EVENT.TITLE) {
+      document.title = `FAQ - ${CONFIG.EVENT.TITLE}`;
+    }
+  </script>
+</body>
+</html>
