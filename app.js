@@ -132,7 +132,8 @@ function buildMsg(){
   return `予約日時：${v.date} ${v.time}
 予約名：${v.name}
 人数：${v.party_size}名
-顔つき身分証：${idTypeText}`;
+顔つき身分証：${idTypeText}
+撮影同意：${v.photo_consent || '未同意'}`;
 }
 
 // デモ用：サンプルデータを自動入力
@@ -142,13 +143,19 @@ function fillDemoData() {
   const demoData = {
     time: `${CONFIG.TIME_SETTINGS.START_HOUR}:${CONFIG.TIME_SETTINGS.START_MINUTE.toString().padStart(2, '0')}`,
     name: '山田太郎',
-    party_size: '2'
+    party_size: '2',
+    age_confirm: true,
+    photo_consent: true
   };
 
   Object.entries(demoData).forEach(([name, value]) => {
     const element = document.querySelector(`[name="${name}"]`);
     if (element) {
-      element.value = value;
+      if (element.type === 'checkbox') {
+        element.checked = value;
+      } else {
+        element.value = value;
+      }
       console.log(`✓ フィールド設定: ${name} = ${value}`);
     }
   });
@@ -273,6 +280,19 @@ function checkReservationDeadline() {
       const ageConfirmCheckbox = $('[name="age_confirm"]');
       if (!ageConfirmCheckbox || !ageConfirmCheckbox.checked) {
         const parent = ageConfirmCheckbox ? ageConfirmCheckbox.closest('.mb-3') : null;
+        if (parent) {
+          parent.classList.add('has-error');
+          if (!firstErrorField) {
+            firstErrorField = parent;
+          }
+        }
+        hasError = true;
+      }
+
+      // 撮影同意チェック
+      const photoConsentCheckbox = $('[name="photo_consent"]');
+      if (!photoConsentCheckbox || !photoConsentCheckbox.checked) {
+        const parent = photoConsentCheckbox ? photoConsentCheckbox.closest('.mb-3') : null;
         if (parent) {
           parent.classList.add('has-error');
           if (!firstErrorField) {

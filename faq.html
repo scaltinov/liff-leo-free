@@ -88,7 +88,7 @@
         </div>
 
         <div class="text-center mb-5">
-          <a href="index.html" class="btn btn-secondary btn-lg w-100">予約フォームに戻る</a>
+          <a href="index.html" id="back-link" class="btn btn-secondary btn-lg w-100">予約フォームに戻る</a>
         </div>
       </div>
     </div>
@@ -99,6 +99,13 @@
     // タイトルの設定
     if (typeof CONFIG !== 'undefined' && CONFIG.EVENT && CONFIG.EVENT.TITLE) {
       document.title = `FAQ - ${CONFIG.EVENT.TITLE}`;
+    }
+    // 戻るボタンのURL設定
+    if (typeof CONFIG !== 'undefined' && CONFIG.LIFF_ID) {
+      const backLink = document.getElementById('back-link');
+      if (backLink) {
+        backLink.href = `https://liff.line.me/${CONFIG.LIFF_ID}`;
+      }
     }
   </script>
 </body>
