@@ -7,7 +7,7 @@ const CONFIG = {
     TITLE: "Leo/Lillion/SiVAH 3店舗合同初回限定営業 予約フォーム",
     DATE_DISPLAY: "2/16", // フォームの「日付」欄に表示される値
     YEAR: "2026",        // n8n等での処理用
-    DEADLINE: "2026-02-16T20:00:00+09:00", // 予約受付終了時刻
+    DEADLINE: "2026-02-14T19:00:00+09:00", // 予約受付終了時刻
     PHONE: "03-5155-0799",
     MAX_PARTY_SIZE: 2,
     ID_TYPES: ["マイナンバーカード", "運転免許証"],
