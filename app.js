@@ -31,11 +31,15 @@ function initUI() {
       if (this.value > CONFIG.EVENT.MAX_PARTY_SIZE) {
         this.value = CONFIG.EVENT.MAX_PARTY_SIZE;
       }
+      updateAdditionalNames();
     });
 
     if (parseInt(partySizeInput.value) > CONFIG.EVENT.MAX_PARTY_SIZE) {
       partySizeInput.value = CONFIG.EVENT.MAX_PARTY_SIZE;
     }
+    
+    // 初期表示時にも実行
+    updateAdditionalNames();
   }
 
   const ageLabel = $('label[for="age_confirm"]');
@@ -81,6 +85,36 @@ function initUI() {
        phoneLink.href = `tel:${CONFIG.EVENT.PHONE.replace(/-/g, '')}`;
        phoneLink.textContent = CONFIG.EVENT.PHONE;
      }
+  }
+}
+
+// 人数に応じて名前入力欄を動的に生成
+function updateAdditionalNames() {
+  const container = $("#additional-names-container");
+  if (!container) return;
+  
+  const size = parseInt($("#party_size").value) || 1;
+  container.innerHTML = '';
+
+  // 1人目は「ご予約者様氏名」として入力済み。2人目以降の入力欄を作成
+  for (let i = 2; i <= size; i++) {
+    const div = document.createElement('div');
+    div.className = 'mb-3';
+    div.innerHTML = `
+      <label class="form-label">同行者 ${i-1} の氏名（本名フルネーム） <span class="text-danger">*</span></label>
+      <div class="row g-2">
+        <div class="col-auto">
+          <select id="gender_${i}" name="gender_${i}" class="form-select" required>
+            <option value="女" selected>女</option>
+            <option value="男">男</option>
+          </select>
+        </div>
+        <div class="col">
+          <input id="name_${i}" name="name_${i}" class="form-control" placeholder="例：佐藤花子" required maxlength="50" />
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
   }
 }
 
@@ -137,11 +171,21 @@ function buildMsg(){
   const idTypes = formData.getAll('id_type');
   const idTypeText = idTypes.length > 0 ? idTypes.join('、') : '';
 
+  // 同行者の名前と性別を取得
+  const names = [`(${v.gender}) ${v.name}`];
+  const size = parseInt(v.party_size) || 1;
+  for (let i = 2; i <= size; i++) {
+    const nextName = v[`name_${i}`];
+    const nextGender = v[`gender_${i}`] || '女';
+    if (nextName) names.push(`(${nextGender}) ${nextName}`);
+  }
+
   return `予約日時：${v.date} ${v.time}
-予約名：${v.name}
+予約名：${names.join(',')}
 人数：${v.party_size}名
 顔つき身分証：${idTypeText}
-撮影同意：${v.photo_consent || '未同意'}`;
+撮影同意：${v.photo_consent || '未同意'}
+初来店：${v.first_visit || '未確認'}`;
 }
 
 // デモ用：サンプルデータを自動入力
@@ -150,11 +194,19 @@ function fillDemoData() {
 
   const demoData = {
     time: `${CONFIG.TIME_SETTINGS.START_HOUR}:${CONFIG.TIME_SETTINGS.START_MINUTE.toString().padStart(2, '0')}`,
-    name: '山田太郎',
+    gender: '女',
+    name: '山田花子',
     party_size: CONFIG.EVENT.MAX_PARTY_SIZE.toString(),
     age_confirm: true,
-    photo_consent: true
+    photo_consent: true,
+    first_visit: true
   };
+
+  // 同行者のダミーデータを追加
+  for (let i = 2; i <= CONFIG.EVENT.MAX_PARTY_SIZE; i++) {
+    demoData[`gender_${i}`] = '男';
+    demoData[`name_${i}`] = `同行者${i-1}太郎`;
+  }
 
   Object.entries(demoData).forEach(([name, value]) => {
     const element = document.querySelector(`[name="${name}"]`);
@@ -167,6 +219,13 @@ function fillDemoData() {
       console.log(`✓ フィールド設定: ${name} = ${value}`);
     }
   });
+
+  // IDタイプのチェックボックスを1つチェックする
+  const firstIdType = document.querySelector('[name="id_type"]');
+  if (firstIdType) {
+    firstIdType.checked = true;
+    console.log("✓ フィールド設定: id_type checked");
+  }
 
   console.log("✅ デモデータの自動入力が完了しました");
 }
@@ -257,6 +316,13 @@ function checkReservationDeadline() {
 
       // 必須項目チェック
       const requiredFields = ['time', 'name', 'party_size'];
+      
+      // 同行者の名前も必須項目に追加
+      const size = parseInt($('[name="party_size"]').value) || 1;
+      for (let i = 2; i <= size; i++) {
+        requiredFields.push(`name_${i}`);
+      }
+
       for(let field of requiredFields) {
         const element = $(`[name="${field}"]`);
         if(element) {
@@ -310,6 +376,19 @@ function checkReservationDeadline() {
       const photoConsentCheckbox = $('[name="photo_consent"]');
       if (!photoConsentCheckbox || !photoConsentCheckbox.checked) {
         const parent = photoConsentCheckbox ? photoConsentCheckbox.closest('.mb-3') : null;
+        if (parent) {
+          parent.classList.add('has-error');
+          if (!firstErrorField) {
+            firstErrorField = parent;
+          }
+        }
+        hasError = true;
+      }
+
+      // 初来店確認チェック
+      const firstVisitCheckbox = $('[name="first_visit"]');
+      if (!firstVisitCheckbox || !firstVisitCheckbox.checked) {
+        const parent = firstVisitCheckbox ? firstVisitCheckbox.closest('.mb-3') : null;
         if (parent) {
           parent.classList.add('has-error');
           if (!firstErrorField) {

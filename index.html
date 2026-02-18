@@ -50,14 +50,28 @@
           </div>
 
           <div class="mb-3">
-            <label for="name" class="form-label">ご予約名 <span class="text-danger">*</span></label>
-            <div class="form-text mb-2">ご来店時に受付にてお伝えください</div>
-            <input id="name" name="name" class="form-control" placeholder="山田花子" required maxlength="50" />
+            <label for="party_size" class="form-label">ご人数 <span class="text-danger">*</span></label>
+            <input id="party_size" name="party_size" type="number" class="form-control" value="1" required min="1" />
           </div>
 
           <div class="mb-3">
-            <label for="party_size" class="form-label">ご人数 <span class="text-danger">*</span></label>
-            <input id="party_size" name="party_size" type="number" class="form-control" value="1" required min="1" />
+            <label class="form-label">ご予約者様氏名（本名フルネーム） <span class="text-danger">*</span></label>
+            <div class="form-text mb-2">ご来店時に受付にてお伝えください</div>
+            <div class="row g-2">
+              <div class="col-auto">
+                <select id="gender" name="gender" class="form-select" required>
+                  <option value="女" selected>女</option>
+                  <option value="男">男</option>
+                </select>
+              </div>
+              <div class="col">
+                <input id="name" name="name" class="form-control" placeholder="山田花子" required maxlength="50" />
+              </div>
+            </div>
+          </div>
+
+          <div id="additional-names-container">
+            <!-- Dynamically populated based on party size -->
           </div>
 
           <div class="mb-3">
@@ -81,6 +95,14 @@
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name="photo_consent" id="photo_consent" value="同意" required />
               <label class="form-check-label" for="photo_consent" style="font-size: 0.9em;">店内での広報目的の撮影（来店者様にはモザイク処理等を施します）に同意する</label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">来店確認<span class="text-danger">*</span></label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="first_visit" id="first_visit" value="確認" required />
+              <label class="form-check-label" for="first_visit">3ヶ月以内に初回で入店はしておらず、飲み直しもしたことがありません。</label>
             </div>
           </div>
 
