@@ -38,12 +38,15 @@
 
         <form id="form" class="card p-4" novalidate>
           <div class="mb-3">
-            <label for="date" class="form-label">日付</label>
-            <input id="date" name="date" class="form-control" value="" readonly />
+            <label for="date" class="form-label">日付 <span class="text-danger">*</span></label>
+            <input id="date" name="date" type="date" class="form-control" required />
+            <div class="form-text">
+              店休日は<a href="https://www.host2.jp/shop/leo/index_sp.html" target="_blank" rel="noopener">こちら</a>で確認できます
+            </div>
           </div>
 
           <div class="mb-3">
-            <label for="time" class="form-label">ご入店予約時刻 <span class="text-danger">*</span></label>
+            <label for="time" class="form-label">ご入店希望時刻 <span class="text-danger">*</span></label>
             <select id="time" name="time" class="form-select" required>
               <option value="">選択してください</option>
             </select>

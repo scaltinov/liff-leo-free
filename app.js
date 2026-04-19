@@ -20,7 +20,14 @@ function initUI() {
   if (h1) h1.textContent = CONFIG.EVENT.TITLE;
 
   const dateInput = $("#date");
-  if (dateInput) dateInput.value = CONFIG.EVENT.DATE_DISPLAY;
+  if (dateInput) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const yyyy = tomorrow.getFullYear();
+    const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const dd = String(tomorrow.getDate()).padStart(2, '0');
+    dateInput.min = `${yyyy}-${mm}-${dd}`;
+  }
 
   const partySizeInput = $("#party_size");
   if (partySizeInput) {
@@ -44,7 +51,7 @@ function initUI() {
 
   const ageLabel = $('label[for="age_confirm"]');
   if (ageLabel) {
-    ageLabel.textContent = `${CONFIG.EVENT.YEAR}年${CONFIG.EVENT.DATE_DISPLAY}日時点で満20歳以上であることに同意`;
+    ageLabel.textContent = `ご予約日時点で満20歳以上であることに同意`;
   }
 
   // 身分証の選択肢を生成
@@ -180,7 +187,13 @@ function buildMsg(){
     if (nextName) names.push(`(${nextGender}) ${nextName}`);
   }
 
-  return `予約日時：${v.date} ${v.time}
+  let dateText = v.date || '';
+  if (v.date) {
+    const d = new Date(v.date);
+    if (!isNaN(d)) dateText = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+  }
+
+  return `予約日時：${dateText} ${v.time}
 予約名：${names.join(',')}
 人数：${v.party_size}名
 顔つき身分証：${idTypeText}
@@ -192,7 +205,12 @@ function buildMsg(){
 function fillDemoData() {
   console.log("🎬 デモモード: サンプルデータを自動入力中...");
 
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const demoDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+
   const demoData = {
+    date: demoDate,
     time: `${CONFIG.TIME_SETTINGS.START_HOUR}:${CONFIG.TIME_SETTINGS.START_MINUTE.toString().padStart(2, '0')}`,
     gender: '女',
     name: '山田花子',
@@ -315,7 +333,7 @@ function checkReservationDeadline() {
       let firstErrorField = null;
 
       // 必須項目チェック
-      const requiredFields = ['time', 'name', 'party_size'];
+      const requiredFields = ['date', 'time', 'name', 'party_size'];
       
       // 同行者の名前も必須項目に追加
       const size = parseInt($('[name="party_size"]').value) || 1;

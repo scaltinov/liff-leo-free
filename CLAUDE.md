@@ -15,7 +15,7 @@ This is a LINE LIFF (LINE Front-end Framework) HTML file for a Japanese reservat
 
 ## Key Components
 
-- **LIFF ID**: `2008341587-r6XPlxxZ` - configured for Leo Platinum LINE application
+- **LIFF ID**: `2008341587-cb5hHT3r` - configured for Leo Platinum LINE application
 - **Reservation form**:
   - Date: 11/8 (fixed, read-only)
   - Time: 20:00〜23:30 in 15-minute intervals (dropdown, required)
