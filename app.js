@@ -192,13 +192,12 @@ function buildMsg(){
   const idTypes = formData.getAll('id_type');
   const idTypeText = idTypes.length > 0 ? idTypes.join('、') : '';
 
-  // 同行者の名前と性別を取得
-  const names = [`(${v.gender}) ${v.name}`];
+  // 同行者の名前を取得（性別は送信メッセージに含めない）
+  const names = [v.name];
   const size = parseInt(v.party_size) || 1;
   for (let i = 2; i <= size; i++) {
     const nextName = v[`name_${i}`];
-    const nextGender = v[`gender_${i}`] || '女';
-    if (nextName) names.push(`(${nextGender}) ${nextName}`);
+    if (nextName) names.push(nextName);
   }
 
   let dateText = v.date || '';
