@@ -324,6 +324,13 @@ function checkReservationDeadline() {
       }
     });
 
+    // 氏名欄のスペースを自動除去（半角・全角）
+    form.addEventListener('focusout', function(e) {
+      if (e.target.matches && e.target.matches('input[name^="name"]')) {
+        e.target.value = e.target.value.replace(/[\s\u3000]/g, '');
+      }
+    });
+
     btn.addEventListener("click", async ()=>{
       err.classList.add('d-none');
       ok.classList.add('d-none');
