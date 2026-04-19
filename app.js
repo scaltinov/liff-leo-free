@@ -31,12 +31,14 @@ function initUI() {
     dateInput.setAttribute('min', minDate);
 
     // iOS LINE等、min属性が効かないWebView向けのフォールバック
+    const dateErrorEl = $('#date-error');
     const validateDate = () => {
       if (dateInput.value && dateInput.value < minDate) {
-        dateInput.value = '';
-        err.textContent = '明日以降の日付を選択してください';
-        err.classList.remove('d-none');
         showFieldError('date');
+        if (dateErrorEl) dateErrorEl.classList.remove('d-none');
+      } else {
+        clearFieldError('date');
+        if (dateErrorEl) dateErrorEl.classList.add('d-none');
       }
     };
     dateInput.addEventListener('change', validateDate);
@@ -372,8 +374,8 @@ function checkReservationDeadline() {
             if (!firstErrorField) firstErrorField = element;
           } else if (field === 'date' && element.min && element.value < element.min) {
             showFieldError(field);
-            err.textContent = '明日以降の日付を選択してください';
-            err.classList.remove('d-none');
+            const dateErrorEl = $('#date-error');
+            if (dateErrorEl) dateErrorEl.classList.remove('d-none');
             hasError = true;
             if (!firstErrorField) firstErrorField = element;
           } else if (field === 'party_size') {
