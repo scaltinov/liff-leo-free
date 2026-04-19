@@ -26,7 +26,21 @@ function initUI() {
     const yyyy = tomorrow.getFullYear();
     const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
     const dd = String(tomorrow.getDate()).padStart(2, '0');
-    dateInput.min = `${yyyy}-${mm}-${dd}`;
+    const minDate = `${yyyy}-${mm}-${dd}`;
+    dateInput.min = minDate;
+    dateInput.setAttribute('min', minDate);
+
+    // iOS LINE等、min属性が効かないWebView向けのフォールバック
+    const validateDate = () => {
+      if (dateInput.value && dateInput.value < minDate) {
+        dateInput.value = '';
+        err.textContent = '明日以降の日付を選択してください';
+        err.classList.remove('d-none');
+        showFieldError('date');
+      }
+    };
+    dateInput.addEventListener('change', validateDate);
+    dateInput.addEventListener('blur', validateDate);
   }
 
   const partySizeInput = $("#party_size");
@@ -353,6 +367,12 @@ function checkReservationDeadline() {
         if(element) {
           if (!element.value.trim()) {
             showFieldError(field);
+            hasError = true;
+            if (!firstErrorField) firstErrorField = element;
+          } else if (field === 'date' && element.min && element.value < element.min) {
+            showFieldError(field);
+            err.textContent = '明日以降の日付を選択してください';
+            err.classList.remove('d-none');
             hasError = true;
             if (!firstErrorField) firstErrorField = element;
           } else if (field === 'party_size') {
