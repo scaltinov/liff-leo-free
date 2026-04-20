@@ -48,21 +48,15 @@ function initUI() {
 
   const partySizeInput = $("#party_size");
   if (partySizeInput) {
-    partySizeInput.max = CONFIG.EVENT.MAX_PARTY_SIZE;
-    
-    // 値が変更された際の制約追加
-    partySizeInput.addEventListener('input', function() {
-      if (this.value > CONFIG.EVENT.MAX_PARTY_SIZE) {
-        this.value = CONFIG.EVENT.MAX_PARTY_SIZE;
-      }
-      updateAdditionalNames();
-    });
-
-    if (parseInt(partySizeInput.value) > CONFIG.EVENT.MAX_PARTY_SIZE) {
-      partySizeInput.value = CONFIG.EVENT.MAX_PARTY_SIZE;
+    for (let i = 1; i <= CONFIG.EVENT.MAX_PARTY_SIZE; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `${i}名`;
+      if (i === 1) opt.selected = true;
+      partySizeInput.appendChild(opt);
     }
-    
-    // 初期表示時にも実行
+
+    partySizeInput.addEventListener('change', updateAdditionalNames);
     updateAdditionalNames();
   }
 

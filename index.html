@@ -38,8 +38,9 @@
 
         <form id="form" class="card p-4" novalidate>
           <div class="mb-3">
-            <label for="date" class="form-label">日付</label>
-            <input id="date" name="date" class="form-control" value="" readonly />
+            <label for="date" class="form-label">日付 <span class="text-danger">*</span></label>
+            <input id="date" name="date" type="date" class="form-control" required />
+            <div id="date-error" class="text-danger small mt-1 d-none">明日以降の日付を選択してください</div>
           </div>
 
           <div class="mb-3">
@@ -51,7 +52,9 @@
 
           <div class="mb-3">
             <label for="party_size" class="form-label">ご人数 <span class="text-danger">*</span></label>
-            <input id="party_size" name="party_size" type="number" class="form-control" value="1" required min="1" />
+            <select id="party_size" name="party_size" class="form-select" required>
+              <!-- Dynamically populated based on MAX_PARTY_SIZE -->
+            </select>
           </div>
 
           <div class="mb-3">
