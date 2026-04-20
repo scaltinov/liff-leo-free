@@ -1,9 +1,9 @@
-// LINEメッセージのパース（予約フォーム対応版）
+// LINEメッセージのパース（来店フォーム対応版）
 const messageText = $('Check if Template').item.json.messageText;
 const userId = $('Extract Basic Info').item.json.userId;
 const timestamp = $('Extract Basic Info').item.json.timestamp;
 
-// 予約フォームのテンプレートをパース
+// 来店フォームのテンプレートをパース
 const parseReservation = (text) => {
   const data = {
     userId: userId,
@@ -14,7 +14,7 @@ const parseReservation = (text) => {
 
   // 全ての項目を初期化
   const allFields = [
-    '予約日時', '予約名', '人数', '身分証', '年齢確認', '撮影同意'
+    '来店希望日時', '名前', '人数', '身分証', '年齢確認', '撮影同意'
   ];
 
   // 全項目を空文字で初期化
@@ -31,8 +31,8 @@ const parseReservation = (text) => {
 
   // 各行をチェックして項目を抽出
   const patterns = {
-    予約日時: /^.*予約日時[：:：]?\s*(.*?)$/,
-    予約名: /^.*予約名[：:：]?\s*(.*?)$/,
+    来店希望日時: /^.*来店希望日時[：:：]?\s*(.*?)$/,
+    名前: /^.*名前[：:：]?\s*(.*?)$/,
     人数: /^.*人数[：:：]?\s*(.*?)$/,
     身分証: /^.*身分証[：:：]?\s*(.*?)$/,
     年齢確認: /^.*年齢確認[：:：]?\s*(.*?)$/,
@@ -74,8 +74,8 @@ const parseReservation = (text) => {
     }
   }
 
-  // 予約日時をNotionの日付形式に変換
-  const yoyakuDateTime = data.parsed['予約日時'];
+  // 来店日時をNotionの日付形式に変換
+  const yoyakuDateTime = data.parsed['来店日時'];
   data.notionDateTime = null;
 
   if (yoyakuDateTime && yoyakuDateTime.length > 0) {
@@ -115,7 +115,6 @@ const parseReservation = (text) => {
     const validIdTypes = {
       'マイナンバーカード': { name: 'マイナンバーカード' },
       '運転免許証': { name: '運転免許証' },
-      '住基カード': { name: '住基カード' }
     };
 
     // 各身分証をマッピング
@@ -134,8 +133,8 @@ const parseReservation = (text) => {
   }
 
   // タイトル生成ロジック
-  const yoyakuName = data.parsed['予約名'] || '';
-  const yoyakuTime = data.parsed['予約日時'] || '';
+  const yoyakuName = data.parsed['名前'] || '';
+  const yoyakuTime = data.parsed['来店日時'] || '';
 
   let title = '';
 
@@ -146,7 +145,7 @@ const parseReservation = (text) => {
   } else if (yoyakuTime) {
     title = yoyakuTime;
   } else {
-    title = `予約_${new Date().toLocaleDateString('ja-JP')}`;
+    title = `来店_${new Date().toLocaleDateString('ja-JP')}`;
   }
 
   data.title = title;

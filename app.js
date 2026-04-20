@@ -248,8 +248,8 @@ function buildMsg(){
     planText = v.plan || '通常';
   }
 
-  return `予約日時：${dateText} ${v.time}
-予約名：${names.join(',')}
+  return `来店希望日時：${dateText} ${v.time}
+名前：${names.join(',')}
 人数：${v.party_size}名
 希望プラン：${planText}
 顔つき身分証：${idTypeText}
@@ -342,7 +342,7 @@ function checkReservationDeadline() {
       if (showClosedMode) {
         console.log("🧪 テストモード - クローズメッセージを強制表示");
       } else {
-        console.log("⏰ 予約受付期限切れ - クローズメッセージを表示");
+        console.log("⏰ 期限切れ - クローズメッセージを表示");
       }
       return;
     }
@@ -548,14 +548,14 @@ function checkReservationDeadline() {
           if(liff.isInClient()){
             await liff.sendMessages([
               {type:"text",text},
-              {type:"text",text:"[予約フォームから送信されました]"}
+              {type:"text",text:"[来店希望フォームから送信されました]"}
             ]);
             ok.classList.remove('d-none');
             setTimeout(()=>{ try{liff.closeWindow();}catch(_){} },600);
           }else if(liff.isApiAvailable('shareTargetPicker')){
             await liff.shareTargetPicker([
               {type:"text",text},
-              {type:"text",text:"[予約フォームから送信されました]"}
+              {type:"text",text:"[来店希望フォームから送信されました]"}
             ]);
             ok.classList.remove('d-none');
           }else{
@@ -564,7 +564,7 @@ function checkReservationDeadline() {
           }
         }
       }catch(e){ err.textContent="送信失敗: "+e.message; err.classList.remove('d-none'); }
-      btn.disabled=false; btn.textContent="予約内容を送信";
+      btn.disabled=false; btn.textContent="内容を送信";
     });
   }catch(e){ logd("init_error: "+e.message); err.textContent="LIFF初期化失敗: "+e.message; err.classList.remove('d-none'); }
 })();
