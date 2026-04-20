@@ -7,6 +7,13 @@
   opacity: 1;
 }
 
+/* iOS Safari の input[type="date"] が中央寄せになるのを左寄せに統一 */
+input[type="date"].form-control {
+  text-align: left;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 #diag {
   font-family: monospace;
   font-size: 12px;
