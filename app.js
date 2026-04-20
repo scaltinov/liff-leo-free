@@ -41,6 +41,7 @@ function initUI() {
         if (dateErrorEl) dateErrorEl.classList.add('d-none');
       }
     };
+    dateInput.addEventListener('input', validateDate);
     dateInput.addEventListener('change', validateDate);
     dateInput.addEventListener('blur', validateDate);
   }
@@ -328,15 +329,15 @@ function checkReservationDeadline() {
       }, 100);
     }
 
-    // エラークリア処理
+    // エラークリア処理（日付欄は validateDate で管理するため除外）
     document.addEventListener('input', function(e) {
-      if (e.target.matches('input, textarea, select') && e.target.classList.contains('is-invalid')) {
+      if (e.target.matches('input, textarea, select') && e.target.classList.contains('is-invalid') && e.target.name !== 'date') {
         clearFieldError(e.target.name);
       }
     });
 
     document.addEventListener('change', function(e) {
-      if (e.target.matches('input, textarea, select') && e.target.classList.contains('is-invalid')) {
+      if (e.target.matches('input, textarea, select') && e.target.classList.contains('is-invalid') && e.target.name !== 'date') {
         clearFieldError(e.target.name);
       }
     });
