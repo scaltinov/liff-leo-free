@@ -227,15 +227,24 @@ function buildMsg(){
   const idTypes = formData.getAll('id_type');
   const idTypeText = idTypes.length > 0 ? idTypes.join('、') : '';
 
-  // 同行者の名前と性別を取得（男性のみ "(男)" を付与、女性は付けない）
-  const formatName = (gender, name) => gender === '男' ? `(男)${name}` : name;
-  const names = [formatName(v.gender, v.name)];
+  // 同行者の名前と性別を取得
+  const members = [{ gender: v.gender, name: v.name }];
   const size = parseInt(v.party_size) || 1;
   for (let i = 2; i <= size; i++) {
     const nextName = v[`name_${i}`];
     const nextGender = v[`gender_${i}`] || '女';
-    if (nextName) names.push(formatName(nextGender, nextName));
+    if (nextName) members.push({ gender: nextGender, name: nextName });
   }
+
+  // 男女混合の場合は 女→男 の順にソート（安定ソート）
+  members.sort((a, b) => {
+    if (a.gender === b.gender) return 0;
+    return a.gender === '女' ? -1 : 1;
+  });
+
+  // 男性のみ "(男)" を付与、女性は付けない
+  const formatName = (gender, name) => gender === '男' ? `(男)${name}` : name;
+  const names = members.map(m => formatName(m.gender, m.name));
 
   let dateText = v.date || '';
   if (v.date) {
