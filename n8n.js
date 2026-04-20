@@ -14,7 +14,7 @@ const parseReservation = (text) => {
 
   // 全ての項目を初期化
   const allFields = [
-    '来店希望日時', '名前', '人数', '身分証', '年齢確認', '撮影同意'
+    '来店希望日時', '名前', '人数', '希望プラン', '身分証', '撮影同意', '初来店'
   ];
 
   // 全項目を空文字で初期化
@@ -34,9 +34,10 @@ const parseReservation = (text) => {
     来店希望日時: /^.*来店希望日時[：:：]?\s*(.*?)$/,
     名前: /^.*名前[：:：]?\s*(.*?)$/,
     人数: /^.*人数[：:：]?\s*(.*?)$/,
+    希望プラン: /^.*希望プラン[：:：]?\s*(.*?)$/,
     身分証: /^.*身分証[：:：]?\s*(.*?)$/,
-    年齢確認: /^.*年齢確認[：:：]?\s*(.*?)$/,
-    撮影同意: /^.*撮影同意[：:：]?\s*(.*?)$/
+    撮影同意: /^.*撮影同意[：:：]?\s*(.*?)$/,
+    初来店: /^.*初来店[：:：]?\s*(.*?)$/
   };
 
   // 各行をチェック
@@ -74,27 +75,23 @@ const parseReservation = (text) => {
     }
   }
 
-  // 来店日時をNotionの日付形式に変換
-  const yoyakuDateTime = data.parsed['来店日時'];
+  // 来店希望日時をNotionの日付形式に変換
+  const yoyakuDateTime = data.parsed['来店希望日時'];
   data.notionDateTime = null;
 
   if (yoyakuDateTime && yoyakuDateTime.length > 0) {
-    // パターン：「11/8 20:00」を解析
-    const dateTimeMatch = yoyakuDateTime.match(/(\d{1,2})\/(\d{1,2})\s+(\d{2}):(\d{2})/);
+    // パターン：「2026/4/22 20:00」を解析
+    const dateTimeMatch = yoyakuDateTime.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{2})/);
 
     if (dateTimeMatch) {
-      const month = dateTimeMatch[1];
-      const day = dateTimeMatch[2];
-      const hour = dateTimeMatch[3];
-      const minute = dateTimeMatch[4];
-
-      // 年を抽出（メッセージにあればそれを使用、なければ現在の年）
-      const yearMatch = text.match(/(\d{4})年/);
-      const currentYear = new Date().getFullYear();
-      const eventYear = yearMatch ? yearMatch[1] : currentYear;
+      const year = dateTimeMatch[1];
+      const month = dateTimeMatch[2];
+      const day = dateTimeMatch[3];
+      const hour = dateTimeMatch[4];
+      const minute = dateTimeMatch[5];
 
       // ISO 8601形式の日時で統合
-      const isoDateTime = `${eventYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour}:${minute}:00`;
+      const isoDateTime = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute}:00`;
 
       data.notionDateTime = isoDateTime;
 
@@ -132,9 +129,26 @@ const parseReservation = (text) => {
     console.log("Converted ID types to array:", data.idTypesArray);
   }
 
+  // 希望プランをマルチセレクト配列に変換（「SPECIAL,BUSINESS」等をカンマ分割）
+  const plans = data.parsed['希望プラン'];
+  data.plansArray = [];
+
+  if (plans && plans.length > 0) {
+    const planArray = plans.split(/[,、]/).map(p => p.trim()).filter(p => p.length > 0);
+    const validPlans = ['通常', 'SPECIAL', 'BUSINESS'];
+
+    for (const p of planArray) {
+      if (validPlans.includes(p) && !data.plansArray.includes(p)) {
+        data.plansArray.push(p);
+      }
+    }
+
+    console.log("Converted plans to array:", data.plansArray);
+  }
+
   // タイトル生成ロジック
   const yoyakuName = data.parsed['名前'] || '';
-  const yoyakuTime = data.parsed['来店日時'] || '';
+  const yoyakuTime = data.parsed['来店希望日時'] || '';
 
   let title = '';
 
@@ -153,6 +167,7 @@ const parseReservation = (text) => {
   console.log("=== 最終パース結果 ===");
   console.log("Parsed data:", JSON.stringify(data.parsed, null, 2));
   console.log("ID Types Array:", JSON.stringify(data.idTypesArray, null, 2));
+  console.log("Plans Array:", JSON.stringify(data.plansArray, null, 2));
   console.log("Generated title:", title);
 
   return data;

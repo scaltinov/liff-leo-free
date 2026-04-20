@@ -136,6 +136,11 @@ function updatePlanVisibility() {
   }
   const maleNote = $("#plan-male-note");
   if (maleNote) maleNote.classList.toggle('d-none', !hasMale);
+  const specialNote = $("#plan-special-note");
+  if (specialNote) {
+    const planVisible = !wrap.classList.contains('d-none');
+    specialNote.classList.toggle('d-none', !(planVisible && planSelect.value === 'SPECIAL'));
+  }
 }
 
 // 人数に応じて名前入力欄を動的に生成
@@ -243,7 +248,7 @@ function buildMsg(){
   if (hasMale && !hasFemale) {
     planText = 'BUSINESS';
   } else if (hasFemale && hasMale) {
-    planText = `女性=${v.plan || '通常'} / 男性=BUSINESS`;
+    planText = `${v.plan || '通常'},BUSINESS`;
   } else {
     planText = v.plan || '通常';
   }
@@ -387,9 +392,9 @@ function checkReservationDeadline() {
       }
     });
 
-    // 性別変更時にプラン欄の表示を更新
+    // 性別・プラン変更時にプラン欄の表示を更新
     form.addEventListener('change', function(e) {
-      if (e.target.matches && e.target.matches('select[name="gender"], select[name^="gender_"]')) {
+      if (e.target.matches && e.target.matches('select[name="gender"], select[name^="gender_"], select[name="plan"]')) {
         updatePlanVisibility();
       }
     });
