@@ -73,6 +73,15 @@
             <!-- Dynamically populated based on party size -->
           </div>
 
+          <div id="plan-wrap" class="mb-3">
+            <label for="plan" class="form-label">ご希望プラン <span class="text-danger">*</span></label>
+            <select id="plan" name="plan" class="form-select" required>
+              <option value="通常" selected>通常</option>
+              <option value="SPECIAL">SPECIAL</option>
+            </select>
+            <div id="plan-male-note" class="form-text d-none">男性は自動的にBUSINESSプランとなります。</div>
+          </div>
+
           <div class="mb-3">
             <label class="form-label">当日提示可能なご身分証 <span class="text-danger">*</span></label>
             <div id="id-types-container">

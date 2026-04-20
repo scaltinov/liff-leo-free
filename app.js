@@ -87,10 +87,10 @@ function initUI() {
     });
   }
 
-  // 注意書きの表示
+  // 注意書きの表示（CONFIG.EVENT.NOTE は HTML 可）
   const noteArea = $("#event-note");
   if (noteArea && CONFIG.EVENT.NOTE) {
-    noteArea.textContent = CONFIG.EVENT.NOTE;
+    noteArea.innerHTML = CONFIG.EVENT.NOTE;
     noteArea.classList.remove('d-none');
   }
 
@@ -110,6 +110,38 @@ function initUI() {
        phoneLink.textContent = CONFIG.EVENT.PHONE;
      }
   }
+}
+
+// 性別構成を集計
+function computeGenderComposition() {
+  const primary = $("#gender");
+  const genders = primary ? [primary.value] : [];
+  const size = parseInt($("#party_size").value) || 1;
+  for (let i = 2; i <= size; i++) {
+    const el = $(`#gender_${i}`);
+    if (el) genders.push(el.value);
+  }
+  return {
+    hasFemale: genders.includes('女'),
+    hasMale: genders.includes('男'),
+  };
+}
+
+// プラン選択欄の表示・非表示（全員男性なら隠して BUSINESS 固定）
+function updatePlanVisibility() {
+  const wrap = $("#plan-wrap");
+  const planSelect = $("#plan");
+  if (!wrap || !planSelect) return;
+  const { hasFemale, hasMale } = computeGenderComposition();
+  if (hasMale && !hasFemale) {
+    wrap.classList.add('d-none');
+    planSelect.required = false;
+  } else {
+    wrap.classList.remove('d-none');
+    planSelect.required = true;
+  }
+  const maleNote = $("#plan-male-note");
+  if (maleNote) maleNote.classList.toggle('d-none', !hasMale);
 }
 
 // 人数に応じて名前入力欄を動的に生成
@@ -140,6 +172,7 @@ function updateAdditionalNames() {
     `;
     container.appendChild(div);
   }
+  updatePlanVisibility();
 }
 
 // バリデーションエラー表示用のヘルパー関数
@@ -211,9 +244,20 @@ function buildMsg(){
     if (!isNaN(d)) dateText = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
   }
 
+  const { hasFemale, hasMale } = computeGenderComposition();
+  let planText;
+  if (hasMale && !hasFemale) {
+    planText = 'BUSINESS';
+  } else if (hasFemale && hasMale) {
+    planText = `女性=${v.plan || '通常'} / 男性=BUSINESS`;
+  } else {
+    planText = v.plan || '通常';
+  }
+
   return `予約日時：${dateText} ${v.time}
 予約名：${names.join(',')}
 人数：${v.party_size}名
+希望プラン：${planText}
 顔つき身分証：${idTypeText}
 撮影同意：${v.photo_consent || '未同意'}
 初来店：${v.first_visit || '未確認'}`;
@@ -346,6 +390,13 @@ function checkReservationDeadline() {
     form.addEventListener('focusout', function(e) {
       if (e.target.matches && e.target.matches('input[name^="name"]')) {
         e.target.value = e.target.value.replace(/[\s\u3000]/g, '');
+      }
+    });
+
+    // 性別変更時にプラン欄の表示を更新
+    form.addEventListener('change', function(e) {
+      if (e.target.matches && e.target.matches('select[name="gender"], select[name^="gender_"]')) {
+        updatePlanVisibility();
       }
     });
 
