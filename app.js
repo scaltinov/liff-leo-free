@@ -68,7 +68,7 @@ function initUI() {
 
   const ageLabel = $('label[for="age_confirm"]');
   if (ageLabel) {
-    ageLabel.textContent = `ご予約日時点で満20歳以上であることに同意`;
+    ageLabel.textContent = `来店日時点で満20歳以上であることに同意`;
   }
 
   // 身分証の選択肢を生成

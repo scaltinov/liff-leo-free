@@ -38,15 +38,8 @@
 
         <form id="form" class="card p-4" novalidate>
           <div class="mb-3">
-            <label for="date" class="form-label">日付 <span class="text-danger">*</span></label>
-            <input id="date" name="date" type="date" class="form-control" required />
-            <div id="date-error" class="text-danger small mt-1 d-none">明日以降の日付を選択してください</div>
-            <div class="form-text">
-              店休日は<a href="https://www.host2.jp/shop/leo/index_sp.html" target="_blank" rel="noopener">こちら</a>で確認できます
-            </div>
-            <div class="form-text">
-              当日のご予約をご希望の際は<a href="tel:0351550799">03-5155-0799</a>までお電話ください
-            </div>
+            <label for="date" class="form-label">日付</label>
+            <input id="date" name="date" class="form-control" value="" readonly />
           </div>
 
           <div class="mb-3">
@@ -63,7 +56,6 @@
 
           <div class="mb-3">
             <label class="form-label">ご予約者様氏名（本名フルネーム） <span class="text-danger">*</span></label>
-            <div class="form-text mb-2">ご来店時に受付にてお伝えください</div>
             <div class="row g-2">
               <div class="col-auto">
                 <select id="gender" name="gender" class="form-select" required>
@@ -72,7 +64,7 @@
                 </select>
               </div>
               <div class="col">
-                <input id="name" name="name" class="form-control" placeholder="山田花子" required maxlength="50" />
+                <input id="name" name="name" class="form-control" placeholder="例:山田花子" required maxlength="50" />
               </div>
             </div>
           </div>
@@ -86,7 +78,7 @@
             <div id="id-types-container">
               <!-- Dynamically populated -->
             </div>
-            <div class="form-text">※有効期限内のものに限ります</div>
+            <div class="form-text">※有効期限内の原本に限ります</div>
           </div>
 
           <div class="mb-3">
