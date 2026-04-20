@@ -147,9 +147,13 @@ function updatePlanVisibility() {
 function updateAdditionalNames() {
   const container = $("#additional-names-container");
   if (!container) return;
-  
+
   const size = parseInt($("#party_size").value) || 1;
   container.innerHTML = '';
+
+  // 3名以上の注意書き
+  const partySizeNote = $("#party-size-note");
+  if (partySizeNote) partySizeNote.classList.toggle('d-none', size < 3);
 
   // 1人目は「ご予約者様氏名」として入力済み。2人目以降の入力欄を作成
   for (let i = 2; i <= size; i++) {

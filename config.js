@@ -9,7 +9,7 @@ const CONFIG = {
     YEAR: "",        // n8n等での処理用
     DEADLINE: "", // 来店受付終了時刻
     PHONE: "03-5155-0799",
-    MAX_PARTY_SIZE: 3,
+    MAX_PARTY_SIZE: 6,
     ID_TYPES: ["マイナンバーカード", "運転免許証"],
     // HTMLタグ可（app.js 側で innerHTML として展開）
     NOTE: `姫パス等他社サービスを併用したご来店希望は受け付けておりません。`
