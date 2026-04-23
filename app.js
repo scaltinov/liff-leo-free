@@ -65,20 +65,11 @@ function initUI() {
     ageLabel.textContent = `来店日時点で満20歳以上であることに同意`;
   }
 
-  // 身分証の選択肢を生成
-  const idContainer = $("#id-types-container");
-  if (idContainer) {
-    idContainer.innerHTML = '';
-    CONFIG.EVENT.ID_TYPES.forEach((type, index) => {
-      const div = document.createElement('div');
-      div.className = 'form-check';
-      const id = `id_type_${index}`;
-      div.innerHTML = `
-        <input class="form-check-input" type="checkbox" name="id_type" id="${id}" value="${type}" />
-        <label class="form-check-label" for="${id}">${type}</label>
-      `;
-      idContainer.appendChild(div);
-    });
+  // 1人目の身分証チェックを生成
+  const primaryIdChecks = document.querySelector('.id-checks[data-person="1"]');
+  if (primaryIdChecks) {
+    renderIdChecks(primaryIdChecks, 1);
+    updateMeishiForPerson(1, $('#gender')?.value || '女');
   }
 
   // 注意書きの表示（CONFIG.EVENT.NOTE は HTML 可）
@@ -104,6 +95,36 @@ function initUI() {
        phoneLink.textContent = CONFIG.EVENT.PHONE;
      }
   }
+}
+
+// 身分証チェック群を生成（personIndex=1,2,...）
+function renderIdChecks(containerEl, personIndex) {
+  const listEl = containerEl.querySelector('.id-type-list');
+  if (!listEl) return;
+  listEl.innerHTML = '';
+  CONFIG.EVENT.ID_TYPES.forEach((type, idx) => {
+    const div = document.createElement('div');
+    div.className = 'form-check';
+    const id = `id_type_${personIndex}_${idx}`;
+    div.innerHTML = `
+      <input class="form-check-input" type="checkbox" name="id_type_${personIndex}" id="${id}" value="${type}" />
+      <label class="form-check-label" for="${id}">${type}</label>
+    `;
+    listEl.appendChild(div);
+  });
+}
+
+// 性別に応じて「職場の名刺等」欄の表示と必須状態を切り替え
+function updateMeishiForPerson(personIndex, genderValue) {
+  const idChecks = document.querySelector(`.id-checks[data-person="${personIndex}"]`);
+  if (!idChecks) return;
+  const meishiWrap = idChecks.querySelector('.meishi-wrap');
+  const meishiInput = idChecks.querySelector(`input[name="meishi_${personIndex}"]`);
+  if (!meishiWrap || !meishiInput) return;
+  const isMale = genderValue === '男';
+  meishiWrap.classList.toggle('d-none', !isMale);
+  meishiInput.required = isMale;
+  if (!isMale) meishiInput.checked = false;
 }
 
 // 性別構成を集計
@@ -172,8 +193,24 @@ function updateAdditionalNames() {
           <input id="name_${i}" name="name_${i}" class="form-control" placeholder="例：佐藤花子" required maxlength="50" />
         </div>
       </div>
+      <div class="id-checks mt-2" data-person="${i}">
+        <div class="small text-muted mb-1">当日提示可能なご身分証 <span class="text-danger">*</span></div>
+        <div class="id-type-list"></div>
+        <div class="meishi-wrap d-none">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="meishi_${i}" id="meishi_${i}" value="確認" />
+            <label class="form-check-label" for="meishi_${i}">職場の名刺等（職場がわかるもの） <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="form-text">※有効期限内の原本に限ります</div>
+      </div>
     `;
     container.appendChild(div);
+    const idChecks = div.querySelector('.id-checks');
+    if (idChecks) {
+      renderIdChecks(idChecks, i);
+      updateMeishiForPerson(i, '女');
+    }
   }
   updatePlanVisibility();
 }
@@ -227,13 +264,25 @@ function buildMsg(){
   const formData = new FormData(form);
   const v = Object.fromEntries(formData.entries());
 
-  // チェックボックスの複数値を取得
-  const idTypes = formData.getAll('id_type');
-  const idTypeText = idTypes.length > 0 ? idTypes.join('、') : '';
+  const size = parseInt(v.party_size) || 1;
+
+  // 全員の身分証をユニオン（男性がいれば「職場名刺等」も追加、名刺は常に末尾）
+  const idSet = new Set();
+  for (let i = 1; i <= size; i++) {
+    formData.getAll(`id_type_${i}`).forEach(t => idSet.add(t));
+    const gender = i === 1 ? v.gender : v[`gender_${i}`];
+    if (gender === '男' && formData.get(`meishi_${i}`)) {
+      idSet.add('職場名刺等');
+    }
+  }
+  const idTypeText = Array.from(idSet).sort((a, b) => {
+    if (a === '職場名刺等') return 1;
+    if (b === '職場名刺等') return -1;
+    return 0;
+  }).join('、');
 
   // 同行者の名前と性別を取得
   const members = [{ gender: v.gender, name: v.name }];
-  const size = parseInt(v.party_size) || 1;
   for (let i = 2; i <= size; i++) {
     const nextName = v[`name_${i}`];
     const nextGender = v[`gender_${i}`] || '女';
@@ -283,7 +332,7 @@ function fillDemoData() {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const demoDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
 
-  const demoData = {
+  const baseData = {
     date: demoDate,
     time: `${CONFIG.TIME_SETTINGS.START_HOUR}:${CONFIG.TIME_SETTINGS.START_MINUTE.toString().padStart(2, '0')}`,
     gender: '女',
@@ -294,31 +343,36 @@ function fillDemoData() {
     first_visit: true
   };
 
-  // 同行者のダミーデータを追加
-  for (let i = 2; i <= CONFIG.EVENT.MAX_PARTY_SIZE; i++) {
-    demoData[`gender_${i}`] = '男';
-    demoData[`name_${i}`] = `同行者${i-1}太郎`;
-  }
-
-  Object.entries(demoData).forEach(([name, value]) => {
+  Object.entries(baseData).forEach(([name, value]) => {
     const element = document.querySelector(`[name="${name}"]`);
-    if (element) {
-      if (element.type === 'checkbox') {
-        element.checked = value;
-      } else {
-        element.value = value;
-      }
-      console.log(`✓ フィールド設定: ${name} = ${value}`);
-    }
+    if (!element) return;
+    if (element.type === 'checkbox') element.checked = value;
+    else element.value = value;
   });
 
-  // IDタイプのチェックボックスを1つチェックする
-  const firstIdType = document.querySelector('[name="id_type"]');
-  if (firstIdType) {
-    firstIdType.checked = true;
-    console.log("✓ フィールド設定: id_type checked");
+  // 人数に応じて同行者欄を生成してからダミーデータを流し込む
+  updateAdditionalNames();
+
+  for (let i = 2; i <= CONFIG.EVENT.MAX_PARTY_SIZE; i++) {
+    const genderEl = $(`#gender_${i}`);
+    if (genderEl) genderEl.value = '男';
+    const nameEl = $(`#name_${i}`);
+    if (nameEl) nameEl.value = `同行者${i-1}太郎`;
   }
 
+  // 各メンバーの身分証を1つチェック、男性は名刺もチェック
+  for (let i = 1; i <= CONFIG.EVENT.MAX_PARTY_SIZE; i++) {
+    const firstIdType = document.querySelector(`[name="id_type_${i}"]`);
+    if (firstIdType) firstIdType.checked = true;
+    const gender = i === 1 ? '女' : '男';
+    updateMeishiForPerson(i, gender);
+    if (gender === '男') {
+      const meishi = document.querySelector(`[name="meishi_${i}"]`);
+      if (meishi) meishi.checked = true;
+    }
+  }
+
+  updatePlanVisibility();
   console.log("✅ デモデータの自動入力が完了しました");
 }
 
@@ -405,9 +459,15 @@ function checkReservationDeadline() {
       }
     });
 
-    // 性別・プラン変更時にプラン欄の表示を更新
+    // 性別・プラン変更時にプラン欄と名刺欄の表示を更新
     form.addEventListener('change', function(e) {
-      if (e.target.matches && e.target.matches('select[name="gender"], select[name^="gender_"], select[name="plan"]')) {
+      if (!e.target.matches) return;
+      if (e.target.matches('select[name="gender"], select[name^="gender_"]')) {
+        const name = e.target.name;
+        const personIndex = name === 'gender' ? 1 : parseInt(name.split('_')[1], 10);
+        updateMeishiForPerson(personIndex, e.target.value);
+        updatePlanVisibility();
+      } else if (e.target.matches('select[name="plan"]')) {
         updatePlanVisibility();
       }
     });
@@ -453,22 +513,30 @@ function checkReservationDeadline() {
         }
       }
 
-      // 身分証チェック（複数選択必須）
-      const idCheckboxes = document.querySelectorAll('[name="id_type"]');
-      const isIdChecked = Array.from(idCheckboxes).some(cb => cb.checked);
-      if (!isIdChecked) {
-        // 最初のチェックボックスの親要素にエラーを表示
-        const firstIdCheckbox = idCheckboxes[0];
-        if (firstIdCheckbox) {
-          const parent = firstIdCheckbox.closest('.mb-3');
+      // 身分証チェック（メンバーごと、男性は名刺も必須）
+      for (let i = 1; i <= size; i++) {
+        const container = document.querySelector(`.id-checks[data-person="${i}"]`);
+        const parent = container ? container.closest('.mb-3') : null;
+        const ids = document.querySelectorAll(`[name="id_type_${i}"]`);
+        const hasId = Array.from(ids).some(cb => cb.checked);
+        if (!hasId) {
           if (parent) {
             parent.classList.add('has-error');
-            if (!firstErrorField) {
-              firstErrorField = parent;
+            if (!firstErrorField) firstErrorField = parent;
+          }
+          hasError = true;
+        }
+        const genderEl = i === 1 ? $('#gender') : $(`#gender_${i}`);
+        if (genderEl && genderEl.value === '男') {
+          const meishi = $(`[name="meishi_${i}"]`);
+          if (!meishi || !meishi.checked) {
+            if (parent) {
+              parent.classList.add('has-error');
+              if (!firstErrorField) firstErrorField = parent;
             }
+            hasError = true;
           }
         }
-        hasError = true;
       }
 
       // 年齢確認チェック

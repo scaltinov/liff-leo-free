@@ -112,6 +112,7 @@ const parseReservation = (text) => {
     const validIdTypes = {
       'マイナンバーカード': { name: 'マイナンバーカード' },
       '運転免許証': { name: '運転免許証' },
+      '職場名刺等': { name: '職場名刺等' },
     };
 
     // 各身分証をマッピング
