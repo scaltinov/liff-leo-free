@@ -118,6 +118,19 @@ function updatePlanVisibility() {
   }
 }
 
+// SPECIAL + 20時台の組み合わせエラー表示
+function updateSpecialPlanAvailability() {
+  const timeSelect = $("#time");
+  const planSelect = $("#plan");
+  const errorEl = $("#plan-special-time-error");
+  if (!timeSelect || !planSelect || !errorEl) return;
+  const hour = parseInt((timeSelect.value || '').split(':')[0], 10);
+  const tooEarly = planSelect.value === 'SPECIAL'
+    && !isNaN(hour)
+    && hour < CONFIG.TIME_SETTINGS.SPECIAL_MIN_HOUR;
+  errorEl.classList.toggle('d-none', !tooEarly);
+}
+
 // 人数に応じて名前入力欄を動的に生成
 function updateAdditionalNames() {
   const container = $("#additional-names-container");
@@ -308,6 +321,7 @@ function checkReservationDeadline() {
 
     // 時刻オプションを生成
     generateTimeOptions();
+    updateSpecialPlanAvailability();
 
     // デバッグモード時はLIFF初期化を無効化
     if (!isDebugMode) {
@@ -349,6 +363,9 @@ function checkReservationDeadline() {
     form.addEventListener('change', function(e) {
       if (e.target.matches('select[name="plan"]')) {
         updatePlanVisibility();
+        updateSpecialPlanAvailability();
+      } else if (e.target.matches('select[name="time"]')) {
+        updateSpecialPlanAvailability();
       }
     });
 
@@ -443,6 +460,32 @@ function checkReservationDeadline() {
           if (!firstErrorField) {
             firstErrorField = parent;
           }
+        }
+        hasError = true;
+      }
+
+      // 時刻確認チェック
+      const timeConfirmCheckbox = $('[name="time_confirm"]');
+      if (!timeConfirmCheckbox || !timeConfirmCheckbox.checked) {
+        const parent = timeConfirmCheckbox ? timeConfirmCheckbox.closest('.mb-3') : null;
+        if (parent) {
+          parent.classList.add('has-error');
+          if (!firstErrorField) {
+            firstErrorField = parent;
+          }
+        }
+        hasError = true;
+      }
+
+      // SPECIALプラン × 21:00未満のチェック
+      const planHour = parseInt(($("#time").value || '').split(':')[0], 10);
+      if ($("#plan").value === 'SPECIAL' && !isNaN(planHour) && planHour < CONFIG.TIME_SETTINGS.SPECIAL_MIN_HOUR) {
+        const planWrap = $("#plan-wrap");
+        const planTimeError = $("#plan-special-time-error");
+        if (planTimeError) planTimeError.classList.remove('d-none');
+        if (planWrap) {
+          planWrap.classList.add('has-error');
+          if (!firstErrorField) firstErrorField = planWrap;
         }
         hasError = true;
       }

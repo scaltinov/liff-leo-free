@@ -22,5 +22,6 @@ const CONFIG = {
     END_HOUR: 22,
     END_MINUTE: 0,
     INTERVAL: 15, // 分単位
+    SPECIAL_MIN_HOUR: 21,
   }
 };

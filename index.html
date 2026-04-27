@@ -85,6 +85,7 @@
               <option value="SPECIAL">SPECIAL</option>
             </select>
             <div id="plan-special-note" class="form-text d-none">※SPECIALプランはご来店時の混雑状況によってお受けできないことがあります。あらかじめご了承ください。</div>
+            <div id="plan-special-time-error" class="text-danger small mt-1 d-none">SPECIALプランは21:00以降のご入店に限ります。</div>
           </div>
 
           <div class="mb-3">
@@ -108,6 +109,14 @@
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name="first_visit" id="first_visit" value="確認" required />
               <label class="form-check-label" for="first_visit">3ヶ月以内に初回で入店はしておらず、飲み直しもしたことがありません。</label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">時刻に関するご確認 <span class="text-danger">*</span></label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="time_confirm" id="time_confirm" value="確認" required />
+              <label class="form-check-label" for="time_confirm">ご希望入店時刻を過ぎた場合は、入店をお断りする場合があることを了承しました。</label>
             </div>
           </div>
 
