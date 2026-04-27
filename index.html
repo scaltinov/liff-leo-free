@@ -66,27 +66,10 @@
 
           <div class="mb-3">
             <label class="form-label">氏名（本名フルネーム） <span class="text-danger">*</span></label>
-            <div class="row g-2">
-              <div class="col-auto">
-                <select id="gender" name="gender" class="form-select" required>
-                  <option value="女" selected>女</option>
-                  <option value="男">男</option>
-                </select>
-              </div>
-              <div class="col">
-                <input id="name" name="name" class="form-control" placeholder="例:山田花子" required maxlength="50" />
-              </div>
-            </div>
+            <input id="name" name="name" class="form-control" placeholder="例:山田花子" required maxlength="50" />
             <div class="id-checks mt-2" data-person="1">
               <div class="small text-muted mb-1">顔写真付き身分証（いずれか1点） <span class="text-danger">*</span></div>
               <div class="id-type-list"></div>
-              <div class="meishi-wrap d-none">
-                <div class="small text-muted mt-2 mb-1">職場が分かるもの（男性のみ必須） <span class="text-danger">*</span></div>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="meishi_1" id="meishi_1" value="確認" />
-                  <label class="form-check-label" for="meishi_1">職場の名刺等</label>
-                </div>
-              </div>
               <div class="form-text">※有効期限内の原本に限ります</div>
             </div>
           </div>
@@ -98,10 +81,9 @@
           <div id="plan-wrap" class="mb-3">
             <label for="plan" class="form-label">ご希望プラン <span class="text-danger">*</span></label>
             <select id="plan" name="plan" class="form-select" required>
-              <option value="通常" selected>通常</option>
+              <option value="通常初回" selected>通常初回</option>
               <option value="SPECIAL">SPECIAL</option>
             </select>
-            <div id="plan-male-note" class="form-text d-none">男性は自動的にBUSINESSプランとなります。</div>
             <div id="plan-special-note" class="form-text d-none">※SPECIALプランはご来店時の混雑状況によってお受けできないことがあります。あらかじめご了承ください。</div>
           </div>
 

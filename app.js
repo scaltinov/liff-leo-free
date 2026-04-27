@@ -2,12 +2,10 @@ const LIFF_ID = CONFIG.LIFF_ID;
 const $ = (s)=>document.querySelector(s);
 const form = $("#form"), btn=$("#submit"), ok=$("#ok"), err=$("#error"), diag=$("#diag");
 
-function logd(obj){
-  // デバッグモードの時のみ表示
-  const urlParams = new URLSearchParams(window.location.search);
-  const isDebugMode = urlParams.has('debug');
+const _urlParams = new URLSearchParams(window.location.search);
 
-  if (isDebugMode) {
+function logd(obj){
+  if (_urlParams.has('debug')) {
     diag.classList.remove('d-none');
     diag.textContent = typeof obj==='string'?obj:JSON.stringify(obj,null,2);
   }
@@ -67,10 +65,7 @@ function initUI() {
 
   // 1人目の身分証チェックを生成
   const primaryIdChecks = document.querySelector('.id-checks[data-person="1"]');
-  if (primaryIdChecks) {
-    renderIdChecks(primaryIdChecks, 1);
-    updateMeishiForPerson(1, $('#gender')?.value || '女');
-  }
+  if (primaryIdChecks) renderIdChecks(primaryIdChecks, 1);
 
   // 注意書きの表示（CONFIG.EVENT.NOTE は HTML 可）
   const noteArea = $("#event-note");
@@ -114,53 +109,12 @@ function renderIdChecks(containerEl, personIndex) {
   });
 }
 
-// 性別に応じて「職場の名刺等」欄の表示と必須状態を切り替え
-function updateMeishiForPerson(personIndex, genderValue) {
-  const idChecks = document.querySelector(`.id-checks[data-person="${personIndex}"]`);
-  if (!idChecks) return;
-  const meishiWrap = idChecks.querySelector('.meishi-wrap');
-  const meishiInput = idChecks.querySelector(`input[name="meishi_${personIndex}"]`);
-  if (!meishiWrap || !meishiInput) return;
-  const isMale = genderValue === '男';
-  meishiWrap.classList.toggle('d-none', !isMale);
-  meishiInput.required = isMale;
-  if (!isMale) meishiInput.checked = false;
-}
-
-// 性別構成を集計
-function computeGenderComposition() {
-  const primary = $("#gender");
-  const genders = primary ? [primary.value] : [];
-  const size = parseInt($("#party_size").value) || 1;
-  for (let i = 2; i <= size; i++) {
-    const el = $(`#gender_${i}`);
-    if (el) genders.push(el.value);
-  }
-  return {
-    hasFemale: genders.includes('女'),
-    hasMale: genders.includes('男'),
-  };
-}
-
-// プラン選択欄の表示・非表示（全員男性なら隠して BUSINESS 固定）
+// SPECIALプラン注意書きの表示・非表示
 function updatePlanVisibility() {
-  const wrap = $("#plan-wrap");
   const planSelect = $("#plan");
-  if (!wrap || !planSelect) return;
-  const { hasFemale, hasMale } = computeGenderComposition();
-  if (hasMale && !hasFemale) {
-    wrap.classList.add('d-none');
-    planSelect.required = false;
-  } else {
-    wrap.classList.remove('d-none');
-    planSelect.required = true;
-  }
-  const maleNote = $("#plan-male-note");
-  if (maleNote) maleNote.classList.toggle('d-none', !hasMale);
   const specialNote = $("#plan-special-note");
-  if (specialNote) {
-    const planVisible = !wrap.classList.contains('d-none');
-    specialNote.classList.toggle('d-none', !(planVisible && planSelect.value === 'SPECIAL'));
+  if (planSelect && specialNote) {
+    specialNote.classList.toggle('d-none', planSelect.value !== 'SPECIAL');
   }
 }
 
@@ -182,38 +136,17 @@ function updateAdditionalNames() {
     div.className = 'mb-3';
     div.innerHTML = `
       <label class="form-label">同行者 ${i-1} の氏名（本名フルネーム） <span class="text-danger">*</span></label>
-      <div class="row g-2">
-        <div class="col-auto">
-          <select id="gender_${i}" name="gender_${i}" class="form-select" required>
-            <option value="女" selected>女</option>
-            <option value="男">男</option>
-          </select>
-        </div>
-        <div class="col">
-          <input id="name_${i}" name="name_${i}" class="form-control" placeholder="例：佐藤花子" required maxlength="50" />
-        </div>
-      </div>
+      <input id="name_${i}" name="name_${i}" class="form-control" placeholder="例：佐藤花子" required maxlength="50" />
       <div class="id-checks mt-2" data-person="${i}">
         <div class="small text-muted mb-1">顔写真付き身分証（いずれか1点） <span class="text-danger">*</span></div>
         <div class="id-type-list"></div>
-        <div class="meishi-wrap d-none">
-          <div class="small text-muted mt-2 mb-1">職場が分かるもの（男性のみ必須） <span class="text-danger">*</span></div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="meishi_${i}" id="meishi_${i}" value="確認" />
-            <label class="form-check-label" for="meishi_${i}">職場の名刺等</label>
-          </div>
-        </div>
         <div class="form-text">※有効期限内の原本に限ります</div>
       </div>
     `;
     container.appendChild(div);
     const idChecks = div.querySelector('.id-checks');
-    if (idChecks) {
-      renderIdChecks(idChecks, i);
-      updateMeishiForPerson(i, '女');
-    }
+    if (idChecks) renderIdChecks(idChecks, i);
   }
-  updatePlanVisibility();
 }
 
 // バリデーションエラー表示用のヘルパー関数
@@ -264,41 +197,18 @@ function generateTimeOptions() {
 function buildMsg(){
   const formData = new FormData(form);
   const v = Object.fromEntries(formData.entries());
-
   const size = parseInt(v.party_size) || 1;
 
-  // 全員の身分証をユニオン（男性がいれば「職場名刺等」も追加、名刺は常に末尾）
   const idSet = new Set();
   for (let i = 1; i <= size; i++) {
     formData.getAll(`id_type_${i}`).forEach(t => idSet.add(t));
-    const gender = i === 1 ? v.gender : v[`gender_${i}`];
-    if (gender === '男' && formData.get(`meishi_${i}`)) {
-      idSet.add('職場名刺等');
-    }
   }
-  const idTypeText = Array.from(idSet).sort((a, b) => {
-    if (a === '職場名刺等') return 1;
-    if (b === '職場名刺等') return -1;
-    return 0;
-  }).join('、');
+  const idTypeText = Array.from(idSet).join('、');
 
-  // 同行者の名前と性別を取得
-  const members = [{ gender: v.gender, name: v.name }];
+  const names = [v.name];
   for (let i = 2; i <= size; i++) {
-    const nextName = v[`name_${i}`];
-    const nextGender = v[`gender_${i}`] || '女';
-    if (nextName) members.push({ gender: nextGender, name: nextName });
+    if (v[`name_${i}`]) names.push(v[`name_${i}`]);
   }
-
-  // 男女混合の場合は 女→男 の順にソート（安定ソート）
-  members.sort((a, b) => {
-    if (a.gender === b.gender) return 0;
-    return a.gender === '女' ? -1 : 1;
-  });
-
-  // 男性のみ "(男)" を付与、女性は付けない
-  const formatName = (gender, name) => gender === '男' ? `(男)${name}` : name;
-  const names = members.map(m => formatName(m.gender, m.name));
 
   let dateText = v.date || '';
   if (v.date) {
@@ -306,20 +216,10 @@ function buildMsg(){
     if (!isNaN(d)) dateText = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
   }
 
-  const { hasFemale, hasMale } = computeGenderComposition();
-  let planText;
-  if (hasMale && !hasFemale) {
-    planText = 'BUSINESS';
-  } else if (hasFemale && hasMale) {
-    planText = `${v.plan || '通常'},BUSINESS`;
-  } else {
-    planText = v.plan || '通常';
-  }
-
   return `来店希望日時：${dateText} ${v.time}
 名前：${names.join(',')}
 人数：${v.party_size}名
-希望プラン：${planText}
+希望プラン：${v.plan || '通常初回'}
 顔つき身分証：${idTypeText}
 撮影同意：${v.photo_consent || '未同意'}
 初来店：${v.first_visit || '未確認'}`;
@@ -336,7 +236,6 @@ function fillDemoData() {
   const baseData = {
     date: demoDate,
     time: `${CONFIG.TIME_SETTINGS.START_HOUR}:${CONFIG.TIME_SETTINGS.START_MINUTE.toString().padStart(2, '0')}`,
-    gender: '女',
     name: '山田花子',
     party_size: CONFIG.EVENT.MAX_PARTY_SIZE.toString(),
     age_confirm: true,
@@ -351,27 +250,16 @@ function fillDemoData() {
     else element.value = value;
   });
 
-  // 人数に応じて同行者欄を生成してからダミーデータを流し込む
   updateAdditionalNames();
 
   for (let i = 2; i <= CONFIG.EVENT.MAX_PARTY_SIZE; i++) {
-    const genderEl = $(`#gender_${i}`);
-    if (genderEl) genderEl.value = '男';
     const nameEl = $(`#name_${i}`);
-    if (nameEl) nameEl.value = `同行者${i-1}太郎`;
-  }
-
-  // 各メンバーの身分証を1つチェック、男性は名刺もチェック
-  for (let i = 1; i <= CONFIG.EVENT.MAX_PARTY_SIZE; i++) {
+    if (nameEl) nameEl.value = `同行者${i-1}花子`;
     const firstIdType = document.querySelector(`[name="id_type_${i}"]`);
     if (firstIdType) firstIdType.checked = true;
-    const gender = i === 1 ? '女' : '男';
-    updateMeishiForPerson(i, gender);
-    if (gender === '男') {
-      const meishi = document.querySelector(`[name="meishi_${i}"]`);
-      if (meishi) meishi.checked = true;
-    }
   }
+  const firstIdType = document.querySelector('[name="id_type_1"]');
+  if (firstIdType) firstIdType.checked = true;
 
   updatePlanVisibility();
   console.log("✅ デモデータの自動入力が完了しました");
@@ -394,11 +282,9 @@ function checkReservationDeadline() {
     // UIの初期化
     initUI();
 
-    // URL パラメータをチェック
-    const urlParams = new URLSearchParams(window.location.search);
-    const isDebugMode = urlParams.has('debug');
-    const isDemoMode = urlParams.has('demo');
-    const showClosedMode = urlParams.has('closed'); // テスト用: クローズメッセージ強制表示
+    const isDebugMode = _urlParams.has('debug');
+    const isDemoMode = _urlParams.has('demo');
+    const showClosedMode = _urlParams.has('closed');
 
     // 予約受付期限チェック
     const isExpired = checkReservationDeadline();
@@ -455,20 +341,13 @@ function checkReservationDeadline() {
 
     // 氏名欄のスペースを自動除去（半角・全角）
     form.addEventListener('focusout', function(e) {
-      if (e.target.matches && e.target.matches('input[name^="name"]')) {
+      if (e.target.matches('input[name^="name"]')) {
         e.target.value = e.target.value.replace(/[\s\u3000]/g, '');
       }
     });
 
-    // 性別・プラン変更時にプラン欄と名刺欄の表示を更新
     form.addEventListener('change', function(e) {
-      if (!e.target.matches) return;
-      if (e.target.matches('select[name="gender"], select[name^="gender_"]')) {
-        const name = e.target.name;
-        const personIndex = name === 'gender' ? 1 : parseInt(name.split('_')[1], 10);
-        updateMeishiForPerson(personIndex, e.target.value);
-        updatePlanVisibility();
-      } else if (e.target.matches('select[name="plan"]')) {
+      if (e.target.matches('select[name="plan"]')) {
         updatePlanVisibility();
       }
     });
@@ -514,7 +393,7 @@ function checkReservationDeadline() {
         }
       }
 
-      // 身分証チェック（メンバーごと、男性は名刺も必須）
+      // 身分証チェック（メンバーごと）
       for (let i = 1; i <= size; i++) {
         const container = document.querySelector(`.id-checks[data-person="${i}"]`);
         const parent = container ? container.closest('.mb-3') : null;
@@ -526,17 +405,6 @@ function checkReservationDeadline() {
             if (!firstErrorField) firstErrorField = parent;
           }
           hasError = true;
-        }
-        const genderEl = i === 1 ? $('#gender') : $(`#gender_${i}`);
-        if (genderEl && genderEl.value === '男') {
-          const meishi = $(`[name="meishi_${i}"]`);
-          if (!meishi || !meishi.checked) {
-            if (parent) {
-              parent.classList.add('has-error');
-              if (!firstErrorField) firstErrorField = parent;
-            }
-            hasError = true;
-          }
         }
       }
 
@@ -592,9 +460,8 @@ function checkReservationDeadline() {
       const text=buildMsg();
       btn.disabled=true; btn.textContent="送信中…";
       try{
-        const currentUrlParams = new URLSearchParams(window.location.search);
-        const currentIsDebugMode = currentUrlParams.has('debug');
-        const currentIsDemoMode = currentUrlParams.has('demo');
+        const currentIsDebugMode = _urlParams.has('debug');
+        const currentIsDemoMode = _urlParams.has('demo');
 
         if (currentIsDebugMode || currentIsDemoMode) {
           console.group("📝 フォーム送信内容");

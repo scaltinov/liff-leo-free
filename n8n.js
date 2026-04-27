@@ -136,7 +136,7 @@ const parseReservation = (text) => {
 
   if (plans && plans.length > 0) {
     const planArray = plans.split(/[,、]/).map(p => p.trim()).filter(p => p.length > 0);
-    const validPlans = ['通常', 'SPECIAL', 'BUSINESS'];
+    const validPlans = ['通常初回', 'SPECIAL'];
 
     for (const p of planArray) {
       if (validPlans.includes(p) && !data.plansArray.includes(p)) {
