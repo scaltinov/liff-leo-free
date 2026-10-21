@@ -1,0 +1,5 @@
+# Cloudflare Pages はリポジトリ内の全ファイルを公開するため、フォームに不要なファイルはトップへ飛ばす
+/CLAUDE.md   /  302
+/n8n.js      /  302
+/.claude/*   /  302
+/reviews/*   /  302
